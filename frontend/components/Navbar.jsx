@@ -1,0 +1,70 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+
+export default function Navbar({ handleNavigate }) {
+  return (
+    <motion.nav
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="fixed top-0 z-50 w-full border-b border-[#e9eeee] bg-white/85 backdrop-blur-xl"
+    >
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-10">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#44858e] text-xl text-white">
+            ◉
+          </div>
+
+          <span className="text-xl font-bold tracking-tight text-[#142625]">
+            Research<span className="text-[#44858e]">Agent</span>
+          </span>
+        </Link>
+
+        {/* Navigation Links */}
+        <div className="hidden items-center gap-9 text-sm font-medium text-[#647c7b] md:flex">
+          <Link href="#features" className="transition hover:text-[#44858e]">
+            Features
+          </Link>
+
+          <Link
+            href="#how-it-works"
+            className="transition hover:text-[#44858e]"
+          >
+            How it works
+          </Link>
+
+          <Link href="#about" className="transition hover:text-[#44858e]">
+            About
+          </Link>
+
+          <button
+            onClick={() => handleNavigate("/feedback")}
+            className="transition hover:text-[#44858e]"
+          >
+            Contact
+          </button>
+        </div>
+
+        {/* Auth Buttons */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => handleNavigate("/signin")}
+            className="hidden rounded-full px-5 py-2.5 text-sm font-semibold text-[#355f63] transition hover:bg-[#edf5f5] sm:block"
+          >
+            Sign In
+          </button>
+
+          <button
+            onClick={() => handleNavigate("/signup")}
+            className="rounded-full bg-[#44858e] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#356e76] hover:shadow-md"
+          >
+            Get Started <span className="ml-2">→</span>
+          </button>
+        </div>
+      </div>
+    </motion.nav>
+  );
+}
