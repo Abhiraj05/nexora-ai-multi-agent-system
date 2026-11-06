@@ -1,0 +1,4 @@
+Flask[async]>=3.0,<4.0
+flask-cors
+autogen-agentchat>=0.7.5,<0.8.0
+autogen-ext[openai]>=0.7.5,<0.8.0
