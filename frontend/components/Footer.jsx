@@ -35,11 +35,11 @@ export default function Footer({ handleNavigate }) {
                 Dashboard
               </button>
 
-              <Link href="/#features" className="hover:text-[#44858e]">
+              <Link href="/#features" className="hover:text-[#44858e] ml-2.5">
                 Features
               </Link>
 
-              <Link href="/#how-it-works" className="hover:text-[#44858e]">
+              <Link href="/#how-it-works" className="hover:text-[#44858e] ml-2.5">
                 How it works
               </Link>
             </div>

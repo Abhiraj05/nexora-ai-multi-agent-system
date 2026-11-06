@@ -383,7 +383,7 @@ export default function Home() {
             </motion.div>
           </section>
 
-          <Footer />
+          <Footer handleNavigate={handleNavigate} />
         </main>
       )}
     </>
