@@ -99,6 +99,7 @@ export default function Signin() {
           name: email.split("@")[0],
           email,
         },
+        data.access_token,
       );
 
       router.push("/dashboard");

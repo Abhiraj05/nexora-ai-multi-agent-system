@@ -70,7 +70,7 @@ export default function Sidebar({ reports = [], activeId, onNew, onSelect }) {
               }
               className={
                 "w-full flex items-center gap-2 rounded-xl p-3 text-left text-xs " +
-                (activeId === r.id
+                (String(activeId) === String(r.id)
                   ? "bg-[#eaf3f3] text-teal"
                   : "text-muted hover:bg-white")
               }

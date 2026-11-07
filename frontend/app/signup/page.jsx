@@ -104,6 +104,7 @@ export default function Signup() {
           name: name.trim(),
           email: email.trim(),
         },
+        data.access_token,
       );
 
       router.push("/dashboard");

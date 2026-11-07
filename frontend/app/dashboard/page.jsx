@@ -10,6 +10,7 @@ import ResearchHome from "@/components/ResearchHome";
 import ReportView from "@/components/ReportView";
 
 import {
+  getAccessToken,
   getReports,
   saveReports,
   validateReport,
@@ -26,6 +27,10 @@ function DashboardContent() {
   const [mode, setMode] = useState("home");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const authorizationHeaders = () => {
+    const token = getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   // Animation variants
   const containerVariants = {
@@ -57,7 +62,9 @@ function DashboardContent() {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get("/api/reports");
+        const response = await axios.get("/api/reports", {
+          headers: authorizationHeaders(),
+        });
 
         const list = response.data.reports || response.data;
 
@@ -66,7 +73,7 @@ function DashboardContent() {
 
         const id = params.get("id");
 
-        if (id && list.some((r) => r.id === id)) {
+        if (id && list.some((r) => String(r.id) === id)) {
           setActive(id);
           setMode("report");
         } else if (params.get("new") === "1") {
@@ -93,7 +100,7 @@ function DashboardContent() {
 
         const id = params.get("id");
 
-        if (id && list.some((r) => r.id === id)) {
+        if (id && list.some((r) => String(r.id) === id)) {
           setActive(id);
           setMode("report");
         } else if (params.get("new") === "1") {
@@ -127,7 +134,7 @@ function DashboardContent() {
 
   // Select report
   const select = (id) => {
-    setActive(id);
+    setActive(String(id));
     setMode("report");
 
     router.replace("/dashboard?id=" + id);
@@ -167,12 +174,22 @@ function DashboardContent() {
           report.createdAt || new Date().toISOString(),
       };
 
-      const updated = [entry, ...reports];
+      const savedResponse = await axios.post("/api/reports", report, {
+        headers: {
+          "Content-Type": "application/json",
+          ...authorizationHeaders(),
+        },
+      });
+      const savedReport = {
+        ...entry,
+        ...savedResponse.data,
+      };
+      const updated = [savedReport, ...reports];
 
       saveReports(updated);
       setReports(updated);
 
-      select(entry.id);
+      select(savedReport.id);
 
     } catch (err) {
       setError(
@@ -228,7 +245,7 @@ function DashboardContent() {
               transition={{ duration: 0.4 }}
             >
               <ReportView
-                report={reports.find((r) => r.id === active)}
+                report={reports.find((r) => String(r.id) === String(active))}
                 onBack={() => {
                   setMode("list");
                   router.replace("/dashboard");

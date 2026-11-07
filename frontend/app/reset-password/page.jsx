@@ -79,9 +79,9 @@ export default function ResetPassword() {
 
     try {
       const email = sessionStorage.getItem("reset_email");
-      const otp = sessionStorage.getItem("reset_otp");
+      const resetToken = sessionStorage.getItem("reset_token");
 
-      if (!email || !otp) {
+      if (!email || !resetToken) {
         throw new Error(
           "Session expired. Please verify your email again."
         );
@@ -91,7 +91,7 @@ export default function ResetPassword() {
         "/api/auth/reset-password",
         {
           email,
-          otp,
+          reset_token: resetToken,
           new_password: password,
         },
         {
@@ -103,7 +103,7 @@ export default function ResetPassword() {
 
       if (response.status === 200 || response.status === 201) {
         sessionStorage.removeItem("reset_email");
-        sessionStorage.removeItem("reset_otp");
+        sessionStorage.removeItem("reset_token");
 
         router.push("/signin");
       }
