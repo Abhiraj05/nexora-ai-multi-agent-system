@@ -1,44 +1,32 @@
-from flask import Flask, abort, jsonify, request
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
-from agent.research_agent import research_team
+from router import (
+    auth_router,
+    email_router,
+    health_router,
+    otp_router,
+    password_router,
+    research_router,
+)
+from db.db_connection import configure_database
+
 
 app = Flask(__name__)
-# Allow the local frontend to call the API.
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+configure_database(app)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-
-@app.get("/api/test")
-async def test_route():
-    # Confirm the API is reachable.
-    return jsonify({"status": "ok", "message": "Async Flask route is working"})
-
-
-@app.post("/api/research")
-async def research_route():
-    # Read and validate the submitted topic.
-    data = request.get_json(silent=True)
-    try:
-        topic = data.get("topic", "").strip()
-        if not topic:
-            abort(400, description="'topic' must be a non-empty string")
-        
-    # Run the research team and return its report.
-        try:
-            result = await research_team.run(task=topic)
-            report = result.messages[-1].content
-            return jsonify(report.model_dump(mode="json"))
-        except:
-            abort(502, description="Research could not be completed. Please try again.")
-    except:
-        abort(400, description="'topic' must be a non-empty string")
-
-    
-
+app.register_blueprint(auth_router)
+app.register_blueprint(email_router)
+app.register_blueprint(health_router)
+app.register_blueprint(otp_router)
+app.register_blueprint(password_router)
+app.register_blueprint(research_router)
 
 @app.errorhandler(HTTPException)
-def handle_error(error):
-    # Return HTTP errors in a consistent JSON format.
+def handle_error(error: HTTPException):
     return jsonify({
         "error": error.name,
         "message": error.description,
@@ -46,5 +34,4 @@ def handle_error(error):
 
 
 if __name__ == "__main__":
-    # Start the Flask development server locally.
     app.run(host="127.0.0.1", port=5000)
