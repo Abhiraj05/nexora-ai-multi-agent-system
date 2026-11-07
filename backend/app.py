@@ -9,6 +9,7 @@ from router import (
     otp_router,
     password_router,
     research_router,
+    reports_router,
 )
 from db.db_connection import configure_database
 
@@ -24,6 +25,7 @@ app.register_blueprint(health_router)
 app.register_blueprint(otp_router)
 app.register_blueprint(password_router)
 app.register_blueprint(research_router)
+app.register_blueprint(reports_router)
 
 @app.errorhandler(HTTPException)
 def handle_error(error: HTTPException):

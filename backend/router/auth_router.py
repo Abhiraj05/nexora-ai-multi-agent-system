@@ -45,9 +45,13 @@ def signup_route():
         db.refresh(user)
 
         return jsonify({
-            "id": user.id,
-            "name": user.name,
-            "email": user.email,
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+            },
+            "access_token": create_token({"sub": user.email}),
+            "token_type": "bearer",
             "message": "Account created successfully.",
         }), 201
 
