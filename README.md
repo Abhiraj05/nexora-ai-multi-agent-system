@@ -1,6 +1,6 @@
 # Nexora
 
-Nexora is an AI-powered research report application. The Next.js frontend connects to a Flask API for accounts, password recovery, feedback, and report persistence. Research generation uses AutoGen agents and OpenAI models. PostgreSQL stores users and reports; Redis stores short-lived password-reset state.
+Nexora is an AI-powered research report application. The Next.js frontend connects to a Flask API for accounts, password recovery, feedback, and report persistence. Research generation uses AutoGen agents and OpenRouter-hosted models. PostgreSQL stores users and reports; Redis stores short-lived password-reset state.
 
 ## Requirements
 
@@ -8,7 +8,7 @@ Nexora is an AI-powered research report application. The Next.js frontend connec
 - Node.js 20.9 or later and npm
 - PostgreSQL
 - Redis
-- An OpenAI API key for research generation
+- An OpenRouter API key for research generation
 - SMTP credentials for signup, password-reset, and feedback email
 
 ## Setup
@@ -19,9 +19,10 @@ From the repository root, create `backend/.env`:
 
 ```env
 SECRET_KEY=replace-with-a-long-random-secret
-DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/nexora
+POSTGRES_PASSWORD=replace-with-a-strong-database-password
+DATABASE_URL=postgresql://user:password@localhost:5432/nexora
 REDIS_URL=redis://localhost:6379
-OPENAI_API_KEY=replace-with-your-openai-api-key
+OPENROUTER_API_KEY=replace-with-your-openrouter-api-key
 
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
@@ -32,6 +33,18 @@ FEEDBACK_RECIPIENT_EMAIL=feedback-recipient@example.com
 ```
 
 Replace the example values with credentials for your services. Keep `.env` files private and do not commit secrets.
+The backend uses only `OPENROUTER_API_KEY` for OpenRouter authentication. Research uses OpenRouter's `liquid/lfm-3-1.7b:free` model, which is listed at zero cost and supports structured outputs. Free-model availability and rate limits are controlled by OpenRouter and may change.
+
+To run the backend with Docker Compose instead, set `SECRET_KEY` and
+`POSTGRES_PASSWORD` in `backend/.env`, then run from the `backend` directory:
+
+```powershell
+docker compose up --build
+```
+
+Compose starts the Flask API, PostgreSQL, and Redis, applies database
+migrations, and persists database/cache data in named volumes. The API listens
+at `http://127.0.0.1:5000`.
 
 Create and activate a virtual environment, then install backend dependencies:
 
@@ -71,12 +84,10 @@ The Flask API listens at `http://127.0.0.1:5000`.
 Create `frontend/.env.local`:
 
 ```env
-BACKEND_API_URL=http://127.0.0.1:5000/api
 NEXT_PUBLIC_API_URL=http://127.0.0.1:5000/api
-RESEARCH_API_URL=http://127.0.0.1:5000/api/research
 ```
 
-`NEXT_PUBLIC_API_URL` is used by the OTP verification screen for verify/resend requests. The other frontend API handlers use the server-side `BACKEND_API_URL` and `RESEARCH_API_URL`.
+`NEXT_PUBLIC_API_URL` is used by browser-side Axios calls to the Flask API, including authentication, OTP verification, feedback, reports, and research. Configure the Flask CORS allowed origin to match the frontend host when deploying outside local development.
 
 In another terminal:
 
@@ -90,21 +101,22 @@ Open `http://localhost:3000`.
 
 ## API routes
 
-The frontend exposes API routes under `/api` and forwards requests to Flask:
+The JSX pages and components call the Flask API directly using Axios and `NEXT_PUBLIC_API_URL`:
 
-| Frontend route | Backend route | Purpose |
-| --- | --- | --- |
-| `POST /api/auth/signup` | `POST /api/auth/signup` | Create an account |
-| `POST /api/auth/signin` | `POST /api/auth/signin` | Sign in |
-| `POST /api/auth/forgot-password` | `POST /api/auth/reset-password` | Send a reset OTP |
-| `POST /api/auth/verify-otp` | `POST /api/auth/verify-otp` | Verify OTP |
-| `POST /api/auth/reset-password` | `POST /api/auth/update-password` | Set a new password |
-| `POST /api/feedback` | `POST /api/feedback` | Send feedback |
-| `GET /api/reports` | `GET /api/reports` | List reports for the signed-in user |
-| `POST /api/reports` | `POST /api/reports` | Save a report |
-| `POST /api/research` | `POST /api/research` | Generate a research report |
+| Backend route | Purpose |
+| --- | --- |
+| `POST /api/auth/signup` | Create an account |
+| `POST /api/auth/signin` | Sign in |
+| `POST /api/auth/reset-password` | Send a reset OTP |
+| `POST /api/auth/verify-otp` | Verify OTP |
+| `POST /api/auth/update-password` | Set a new password |
+| `POST /api/auth/resend-otp` | Resend an OTP |
+| `POST /api/feedback` | Send feedback |
+| `GET /api/reports` | List reports for the signed-in user |
+| `POST /api/reports` | Save a report |
+| `POST /api/research` | Generate a research report |
 
-Flask also provides `POST /api/auth/resend-otp` and `GET /api/test`.
+Flask also provides `GET /api/test`.
 
 ## Tests and checks
 

@@ -14,6 +14,11 @@ class UserSignIn(BaseModel):
     password: str = Field(min_length=1)
 
 
+class UserProfileUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=100)
+    email: str | None = Field(default=None, min_length=1, max_length=255)
+
+
 class ReportRead(ResearchReport):
     id: int
     user_id: int

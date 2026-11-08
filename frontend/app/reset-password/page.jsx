@@ -14,6 +14,7 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -97,7 +98,8 @@ export default function ResetPassword() {
         sessionStorage.removeItem("reset_email");
         sessionStorage.removeItem("reset_token");
 
-        router.push("/signin");
+        setStatus(response.data?.message || "Password updated successfully.");
+        setTimeout(() => router.push("/signin"), 1800);
       }
 
     } catch (err) {
@@ -118,10 +120,13 @@ export default function ResetPassword() {
       description="Choose a strong new password to secure your account."
     >
       <Toast
-        message={error}
-        type="error"
-        show={!!error}
-        onClose={() => setError("")}
+        message={error || status}
+        type={error ? "error" : "success"}
+        show={!!(error || status)}
+        onClose={() => {
+          setError("");
+          setStatus("");
+        }}
       />
       <motion.form
         onSubmit={handleSubmit}

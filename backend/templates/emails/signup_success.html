@@ -1,7 +1,9 @@
-{% extends "emails/base.html" %}
-{% block title %}Welcome, {{ username }}{% endblock %}
-{% block content %}
+{% extends "emails/base.html" %} {% block title %}Welcome, {{ username }}{%
+endblock %} {% block content %}
 <p>Hello {{ username }},</p>
 <p>{{ message }}</p>
-<p>Your account is registered with <strong>{{ email }}</strong>. You can now sign in and get started.</p>
+<p>
+  Your account is registered with <strong>{{ email }}</strong>. You can now sign
+  in and get started.
+</p>
 {% endblock %}

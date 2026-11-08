@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import {
+  ArrowUp,
+  CircleUserRound,
+  Globe2,
+  LayoutDashboard,
+  Microscope,
+  Search,
+  Sparkles,
+  Telescope,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
+import Toast from "@/components/Toast";
 
 const features = [
   {
@@ -94,6 +105,24 @@ const itemVariants = {
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setIsLoggedIn(!!localStorage.getItem("research_access_token"));
+      const noticeMessage =
+        sessionStorage.getItem("account_deleted_toast") ||
+        sessionStorage.getItem("logout_toast");
+      if (noticeMessage) {
+        sessionStorage.removeItem("account_deleted_toast");
+        sessionStorage.removeItem("logout_toast");
+        setNotice(noticeMessage);
+      }
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -107,6 +136,12 @@ export default function Home() {
 
       {!loading && (
         <main className="min-h-screen overflow-hidden text-[#142625]">
+          <Toast
+            message={notice}
+            type="success"
+            show={!!notice}
+            onClose={() => setNotice("")}
+          />
           <Navbar handleNavigate={handleNavigate} />
 
           {/* HERO SECTION */}
@@ -150,10 +185,12 @@ export default function Home() {
                 className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
               >
                 <button
-                  onClick={() => handleNavigate("/signup")}
+                  onClick={() =>
+                    handleNavigate(isLoggedIn ? "/dashboard" : "/signup")
+                  }
                   className="flex items-center justify-center gap-3 rounded-full bg-primary-600 px-9 py-4 text-sm font-semibold text-white shadow-lg shadow-primary-600/20 transition hover:-translate-y-1 hover:bg-primary-500"
                 >
-                  Start Researching →
+                  {isLoggedIn ? "Open Dashboard →" : "Start Researching →"}
                 </button>
 
                 <Link
@@ -180,73 +217,123 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="relative mx-auto mt-20 max-w-5xl"
+              className="relative mx-auto mt-20 max-w-6xl"
             >
-              <div className="rounded-2xl border border-[#e4ebea] bg-white p-3 shadow-[0_25px_80px_-30px_rgba(40,90,90,0.22)] sm:p-6">
-                <div className="flex items-center justify-between border-b border-[#edf0ef] pb-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white">
-                      ✦
-                    </div>
-
-                    <div>
-                      <h3 className="text-sm font-bold">Research Workspace</h3>
-                      <p className="text-xs text-[#93a5a3]">
-                        Your AI research assistant
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className="rounded-full bg-[#eaf5ef] px-3 py-1.5 text-xs font-semibold text-primary-600">
-                    ● Ready
-                  </span>
-                </div>
-
-                <div className="px-2 py-10 text-center sm:px-10 sm:py-14">
-                  <span className="rounded-full bg-[#edf5f3] px-4 py-2 text-[10px] font-bold tracking-widest text-[#44858e]">
-                    AI-POWERED RESEARCH
-                  </span>
-
-                  <h2 className="mt-6 text-2xl font-bold tracking-tight sm:text-4xl">
-                    What do you want to discover?
-                  </h2>
-
-                  <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-[#849795]">
-                    Enter any topic and let your AI research agent do the
-                    exploration for you.
-                  </p>
-
-                  <div className="mx-auto mt-9 flex max-w-2xl items-center gap-3 rounded-xl border border-[#e0e9e7] bg-[#fcfdfd] p-3 shadow-sm">
-                    <span className="pl-2 text-lg text-[#44858e]">⌕</span>
-
-                    <span className="flex-1 text-left text-sm text-[#a5b3b1]">
-                      What do you want to research?
-                    </span>
-
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white">
-                      →
-                    </div>
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap justify-center gap-3">
-                    {[
-                      "Artificial Intelligence",
-                      "Climate Change",
-                      "Machine Learning",
-                    ].map((topic) => (
-                      <span
-                        key={topic}
-                        className="rounded-full border border-[#e5eceb] bg-white px-4 py-2 text-xs text-[#78908e]"
-                      >
-                        {topic}
+              <div className="overflow-hidden rounded-2xl border border-slate-700/70 bg-slate-950 shadow-[0_30px_90px_-35px_rgba(0,0,0,0.75)]">
+                <div className="flex min-h-137.5">
+                  <aside className="hidden w-56 shrink-0 flex-col border-r border-slate-700/70 bg-slate-900/90 sm:flex">
+                    <div className="flex h-18.5 items-center gap-3 border-b border-slate-700/70 px-4">
+                      <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary-600 text-white">
+                        <Microscope size={21} aria-hidden="true" />
                       </span>
-                    ))}
-                  </div>
-                </div>
+                      <span className="font-bold tracking-tight text-slate-100">
+                        Nexora
+                      </span>
+                    </div>
+                    <div className="flex-1 px-4 py-7">
+                      <p className="mb-3 px-2 text-[10px] font-bold tracking-[.16em] text-slate-500">
+                        WORKSPACE
+                      </p>
+                      <div className="flex items-center gap-3 rounded-xl bg-primary-600/15 px-3 py-3 text-sm font-semibold text-primary-400">
+                        <LayoutDashboard size={17} aria-hidden="true" />
+                        Dashboard
+                      </div>
+                    </div>
+                    <div className="border-t border-slate-700/70 p-4">
+                      <div className="mb-3 flex items-center gap-3 text-sm text-slate-300">
+                        <CircleUserRound
+                          size={19}
+                          className="text-primary-400"
+                          aria-hidden="true"
+                        />
+                        Your account
+                      </div>
+                      <div className="rounded-xl bg-primary-600 px-3 py-2 text-center text-xs font-semibold text-white">
+                        Sign Out
+                      </div>
+                    </div>
+                  </aside>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#edf0ef] px-3 pt-5 text-xs text-[#91a3a1] sm:px-5">
-                  <span>✦ Intelligent research assistant</span>
-                  <span>Powered by AI agents</span>
+                  <div className="min-w-0 flex-1 bg-slate-950 px-5 py-9 sm:px-9 sm:py-11">
+                    <div className="mx-auto max-w-2xl">
+                      <div className="text-center">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-primary-600/15 px-3 py-1 text-[10px] font-bold tracking-[.15em] text-primary-400">
+                          <Sparkles size={12} aria-hidden="true" />
+                          AI-POWERED RESEARCH
+                        </span>
+                        <h2 className="mt-6 text-3xl font-bold tracking-tight text-slate-100 sm:text-4xl">
+                          Study, Research,
+                          <br />
+                          <span className="text-primary-400">
+                            Discover Everything.
+                          </span>
+                        </h2>
+                        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-slate-400">
+                          Deploy advanced AI agents to synthesize knowledge
+                          from the entire web in seconds.
+                        </p>
+                      </div>
+
+                      <div className="mt-9 rounded-[18px] border border-slate-700/80 bg-slate-900/90 p-4 shadow-xl sm:p-5">
+                        <div className="flex min-h-20 items-start gap-3">
+                          <Search
+                            size={17}
+                            className="mt-1 shrink-0 text-primary-400"
+                            aria-hidden="true"
+                          />
+                          <span className="text-left text-sm text-slate-500">
+                            What do you want to know?
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between border-t border-slate-700/70 pt-3">
+                          <div className="flex items-center gap-3 text-slate-500">
+                            <Globe2 size={17} aria-hidden="true" />
+                            <Telescope size={17} aria-hidden="true" />
+                          </div>
+                          <span className="grid h-10 w-10 place-items-center rounded-full bg-primary-600 text-white">
+                            <ArrowUp size={19} aria-hidden="true" />
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-7 grid gap-3 sm:grid-cols-3">
+                        {[
+                          {
+                            icon: Globe2,
+                            title: "Real-time Web",
+                            description: "Latest data and academic papers.",
+                          },
+                          {
+                            icon: Telescope,
+                            title: "Deep Synthesis",
+                            description: "Multiple perspectives, one report.",
+                          },
+                          {
+                            icon: Sparkles,
+                            title: "Pro Insights",
+                            description: "Expert insights with citations.",
+                          },
+                        ].map(({ icon: Icon, title, description }) => (
+                          <div
+                            key={title}
+                            className="rounded-2xl border border-slate-700/70 bg-slate-900/80 p-4"
+                          >
+                            <Icon
+                              size={19}
+                              className="text-primary-400"
+                              aria-hidden="true"
+                            />
+                            <h3 className="mt-3 text-xs font-bold text-slate-200">
+                              {title}
+                            </h3>
+                            <p className="mt-1 text-[11px] leading-5 text-slate-400">
+                              {description}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -374,10 +461,12 @@ export default function Home() {
                 </p>
 
                 <button
-                  onClick={() => handleNavigate("/signup")}
-                  className="mt-9 inline-flex items-center gap-3 rounded-full bg-white px-9 py-4 text-sm font-bold text-[#326e75] transition hover:-translate-y-1 hover:bg-[#edf5f3]"
+                  onClick={() =>
+                    handleNavigate(isLoggedIn ? "/dashboard" : "/signup")
+                  }
+                  className="mt-9 inline-flex items-center gap-3 rounded-full bg-slate-950 px-9 py-4 text-sm font-bold text-white transition hover:-translate-y-1 hover:bg-slate-800"
                 >
-                  Get Started For Free →
+                  {isLoggedIn ? "Go to Your Dashboard →" : "Get Started For Free →"}
                 </button>
               </div>
             </motion.div>

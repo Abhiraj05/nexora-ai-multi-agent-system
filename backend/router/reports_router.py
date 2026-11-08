@@ -85,3 +85,26 @@ async def create_report_route():
     except SQLAlchemyError:
         current_app.logger.exception("Failed to create report.")
         abort(500, description="Failed to create report.")
+
+
+@reports_router.delete("/reports/<int:report_id>")
+async def delete_report_route(report_id: int):
+    try:
+        session_factory = current_app.extensions["async_db_session_factory"]
+        async with session_factory() as db:
+            user = await get_current_user(db)
+            report = await db.scalar(
+                select(Report).where(
+                    Report.id == report_id,
+                    Report.user_id == user.id,
+                )
+            )
+            if report is None:
+                abort(404, description="Report not found.")
+
+            await db.delete(report)
+            await db.commit()
+            return jsonify({"message": "Report deleted successfully."})
+    except SQLAlchemyError:
+        current_app.logger.exception("Failed to delete report.")
+        abort(500, description="Failed to delete report.")

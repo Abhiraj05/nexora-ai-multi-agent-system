@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import axios from "axios";
 import AuthShell from "@/components/AuthShell";
 import Loader from "@/components/Loader";
 import Toast from "@/components/Toast";
-import { ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Signup() {
   const router = useRouter();
+  const [checkingSession, setCheckingSession] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
@@ -19,7 +20,20 @@ export default function Signup() {
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [accountCreated, setAccountCreated] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [showSigninPrompt, setShowSigninPrompt] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      if (localStorage.getItem("research_access_token")) {
+        router.replace("/dashboard");
+      } else {
+        setCheckingSession(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [router]);
 
   // Animation variants
   const containerVariants = {
@@ -99,7 +113,7 @@ export default function Signup() {
       );
 
       setPassword("");
-      setAccountCreated(true);
+      setSuccess("Account created successfully. You can now sign in.");
     } catch (err) {
       setError(
         err.response?.data?.detail ||
@@ -113,56 +127,49 @@ export default function Signup() {
   return (
     <>
       <Toast
-        message={error}
-        type="error"
-        show={!!error}
-        onClose={() => setError("")}
+        message={error || success}
+        type={error ? "error" : "success"}
+        show={!!(error || success)}
+        onClose={() => {
+          setError("");
+          if (success) setShowSigninPrompt(true);
+          setSuccess("");
+        }}
       />
 
-      {accountCreated && (
-        <div
-          className="fixed inset-0 z-10000 flex items-center justify-center bg-slate-950/75 px-4 backdrop-blur-sm"
-          role="presentation"
-        >
+      {showSigninPrompt && (
+        <div className="fixed inset-0 z-10000 grid place-items-center bg-slate-950/75 px-4 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="signup-success-title"
-            aria-describedby="signup-success-description"
+            aria-labelledby="signup-next-step-title"
             className="w-full max-w-md rounded-2xl border border-primary-500/25 bg-slate-900 p-7 text-center shadow-2xl shadow-black/40"
           >
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600/15 text-primary-500">
-              <CheckCircle2 size={30} aria-hidden="true" />
-            </div>
             <h2
-              id="signup-success-title"
-              className="mt-5 text-xl font-bold text-slate-100"
+              id="signup-next-step-title"
+              className="text-xl font-bold text-slate-100"
             >
-              Account created
+              You&apos;re all set
             </h2>
-            <p
-              id="signup-success-description"
-              className="mt-2 text-sm leading-6 text-slate-300"
-            >
-              Your account is ready. Sign in to continue.
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Your account was created. Sign in to start using Nexora.
             </p>
             <button
               type="button"
               onClick={() => router.replace("/signin")}
-              className="primary mt-6 inline-flex w-full items-center justify-center gap-2"
+              className="primary mt-6 w-full"
             >
               Go to Sign In
-              <ArrowRight size={17} aria-hidden="true" />
             </button>
           </motion.div>
         </div>
       )}
 
-      {loading && <Loader />}
+      {(loading || checkingSession) && <Loader />}
 
-      {!loading && (
+      {!loading && !checkingSession && (
         <AuthShell
           eyebrow="JOIN RESEARCH AGENT"
           title="Create an account"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import axios from "axios";
@@ -12,12 +12,27 @@ import { Eye, EyeOff } from "lucide-react";
 export default function Signin() {
   const router = useRouter();
 
+  const [checkingSession, setCheckingSession] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      if (localStorage.getItem("research_access_token")) {
+        router.replace("/dashboard");
+      } else {
+        setCheckingSession(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [router]);
+
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -107,7 +122,8 @@ export default function Signin() {
         localStorage.setItem("research_access_token", data.access_token);
       }
 
-      router.push("/dashboard");
+      setSuccess("Signed in successfully.");
+      setTimeout(() => router.push("/dashboard"), 1800);
     } catch (err) {
       setError(
         err.response?.data?.detail ||
@@ -121,15 +137,18 @@ export default function Signin() {
   return (
     <>
       <Toast
-        message={error}
-        type="error"
-        show={!!error}
-        onClose={() => setError("")}
+        message={error || success}
+        type={error ? "error" : "success"}
+        show={!!(error || success)}
+        onClose={() => {
+          setError("");
+          setSuccess("");
+        }}
       />
 
-      {loading && <Loader />}
+      {(loading || checkingSession) && <Loader />}
 
-      {!loading && (
+      {!loading && !checkingSession && (
         <AuthShell
           eyebrow="WELCOME BACK"
           title="Sign in to your account"
@@ -220,12 +239,13 @@ export default function Signin() {
               variants={itemVariants}
               className="text-sm text-center text-muted"
             >
-              New to Nexora?{" "}
+              Don&apos;t have an account?{" "}
               <button
+                type="button"
                 className="text-teal font-semibold hover:underline"
                 onClick={() => handleNavigate("/signup")}
               >
-                Create an account
+                Sign up
               </button>
             </motion.p>
           </motion.form>

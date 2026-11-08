@@ -19,30 +19,29 @@ const labels = {
 };
 export default function ReportView({ report, onBack }) {
   if (!report) return null;
+  const reportText = [
+    report.title,
+    "",
+    ...Object.entries(labels).flatMap(([key, label]) => {
+      const value = report[key];
+      const content = Array.isArray(value)
+        ? value.map((item) => `- ${item}`).join("\n")
+        : value || "";
+      return [label, content, ""];
+    }),
+  ].join("\n");
+  const reportDate = report.createdAt ? new Date(report.createdAt) : null;
+  const formattedDate =
+    reportDate && !Number.isNaN(reportDate.getTime())
+      ? reportDate.toLocaleString()
+      : "";
+
   const download = () => {
-    const blob = new Blob(
-      [
-        JSON.stringify(
-          {
-            title: report.title,
-            introduction: report.introduction,
-            background: report.background,
-            key_findings: report.key_findings,
-            benefits: report.benefits,
-            challenges: report.challenges,
-            conclusion: report.conclusion,
-            references: report.references,
-          },
-          null,
-          2,
-        ),
-      ],
-      { type: "application/json" },
-    );
+    const blob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "research-report.json";
+    a.download = "research-report.txt";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -59,7 +58,7 @@ export default function ReportView({ report, onBack }) {
           onClick={download}
           className="secondary text-sm flex items-center gap-2"
         >
-          <Download size={16} /> Export JSON
+          <Download size={16} /> Export text
         </button>
       </div>
       <div className="inline-flex rounded-full bg-[#eaf3f3] text-teal text-[11px] tracking-[.13em] font-bold px-3 py-1 mb-5">
@@ -69,7 +68,7 @@ export default function ReportView({ report, onBack }) {
         {report.title}
       </h1>
       <p className="text-sm text-muted mb-10">
-        {report.createdAt ? new Date(report.createdAt).toLocaleString() : ""}
+        {formattedDate}
       </p>
       <div className="space-y-5">
         {Object.keys(labels).map((key) => (

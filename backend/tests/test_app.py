@@ -85,6 +85,99 @@ class TestAsyncFlaskRoute(unittest.TestCase):
         db.commit.assert_awaited_once()
         db.refresh.assert_awaited_once()
 
+    def test_delete_report_removes_report_owned_by_current_user(self):
+        user = SimpleNamespace(id=1)
+        report = SimpleNamespace(id=42, user_id=1)
+        db = AsyncMock()
+        db.scalar.return_value = report
+        self.set_async_session_factory(db)
+
+        with patch(
+            "router.reports_router.get_current_user",
+            new=AsyncMock(return_value=user),
+        ):
+            response = self.client.delete("/api/reports/42")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get_json()["message"],
+            "Report deleted successfully.",
+        )
+        db.delete.assert_awaited_once_with(report)
+        db.commit.assert_awaited_once()
+
+    def test_delete_report_returns_not_found_for_other_users_report(self):
+        db = AsyncMock()
+        db.scalar.return_value = None
+        self.set_async_session_factory(db)
+
+        with patch(
+            "router.reports_router.get_current_user",
+            new=AsyncMock(return_value=SimpleNamespace(id=1)),
+        ):
+            response = self.client.delete("/api/reports/42")
+
+        self.assertEqual(response.status_code, 404)
+        db.delete.assert_not_awaited()
+        db.commit.assert_not_awaited()
+
+    def test_profile_endpoint_returns_authenticated_user(self):
+        user = SimpleNamespace(id=1, name="Ada Lovelace", email="ada@example.com")
+        db = AsyncMock()
+        self.set_async_session_factory(db)
+
+        with patch(
+            "router.auth_router.get_current_user",
+            new=AsyncMock(return_value=user),
+        ):
+            response = self.client.get("/api/auth/profile")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["user"], {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+        })
+
+    def test_profile_update_changes_name_and_email_and_returns_new_token(self):
+        user = SimpleNamespace(id=1, name="Ada", email="ada@example.com")
+        db = AsyncMock()
+        db.scalar.return_value = None
+        self.set_async_session_factory(db)
+
+        with patch(
+            "router.auth_router.get_current_user",
+            new=AsyncMock(return_value=user),
+        ):
+            response = self.client.patch(
+                "/api/auth/profile",
+                json={"name": "Ada Lovelace", "email": "ADA@EXAMPLE.COM"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["user"], {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+        })
+        self.assertTrue(response.get_json()["access_token"])
+        db.commit.assert_awaited_once()
+
+    def test_profile_delete_removes_authenticated_user(self):
+        user = SimpleNamespace(id=1, name="Ada", email="ada@example.com")
+        db = AsyncMock()
+        self.set_async_session_factory(db)
+
+        with patch(
+            "router.auth_router.get_current_user",
+            new=AsyncMock(return_value=user),
+        ):
+            response = self.client.delete("/api/auth/profile")
+
+        self.assertEqual(response.status_code, 200)
+        db.delete.assert_awaited_once_with(user)
+        db.commit.assert_awaited_once()
+
     def test_unknown_route_returns_not_found(self):
         response = self.client.get("/missing")
 

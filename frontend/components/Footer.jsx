@@ -1,7 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import { Microscope } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Footer({ handleNavigate }) {
+  const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setIsLoggedIn(!!localStorage.getItem("research_access_token"));
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [pathname]);
+
   return (
     <footer className="border-t border-[#e7eeed] bg-white px-6 py-12">
       <div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 md:flex-row">
@@ -27,7 +41,7 @@ export default function Footer({ handleNavigate }) {
           <div>
             <h4 className="text-sm font-bold text-[#142625]">Platform</h4>
 
-            <div className="mt-5 flex flex-col gap-4 text-sm text-[#829492]">
+            <div className="mt-5 flex flex-col gap-4 text-sm text-[#142625]">
               <button
                 onClick={() => handleNavigate("/dashboard")}
                 className="hover:text-[#44858e]"
@@ -49,19 +63,27 @@ export default function Footer({ handleNavigate }) {
             <h4 className="text-sm font-bold text-[#142625]">Account</h4>
 
             <div className="mt-5 flex flex-col gap-4 text-sm text-[#829492]">
-              <button
-                onClick={() => handleNavigate("/signin")}
-                className="hover:text-[#44858e]"
-              >
-                Sign In
-              </button>
-
-              <button
-                onClick={() => handleNavigate("/signup")}
-                className="hover:text-[#44858e]"
-              >
-                Sign Up
-              </button>
+              {isLoggedIn ? (
+                <button
+                    onClick={() => handleNavigate("/profile")} className="hover:text-[#44858e]">
+                  Profile
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => handleNavigate("/signin")}
+                    className="hover:text-[#44858e]"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => handleNavigate("/signup")}
+                    className="hover:text-[#44858e]"
+                  >
+                    Sign Up
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={() => handleNavigate("/feedback")}

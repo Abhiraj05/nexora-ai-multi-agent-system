@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 import Sidebar from "@/components/Sidebar";
 import ResearchHome from "@/components/ResearchHome";
 import ReportView from "@/components/ReportView";
+import Loader from "@/components/Loader";
 
-import { FileText, Plus, ArrowRight } from "lucide-react";
+import { FileText, Plus, ArrowRight, Trash2 } from "lucide-react";
+import Toast from "@/components/Toast";
 
 const getReports = () => {
   try {
@@ -35,11 +38,18 @@ const validateReport = (report) =>
 function DashboardContent() {
   const router = useRouter();
   const params = useSearchParams();
+  const pathname = usePathname();
 
   const [reports, setReports] = useState([]);
   const [active, setActive] = useState(null);
   const [mode, setMode] = useState("home");
   const [loading, setLoading] = useState(false);
+  const [navigationLoading, setNavigationLoading] = useState(false);
+  const [authenticated, setAuthenticated] = useState(null);
+  const [reportToDelete, setReportToDelete] = useState(null);
+  const [deletingReport, setDeletingReport] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [noticeType, setNoticeType] = useState("success");
   const authorizationHeaders = () => {
     const token = localStorage.getItem("research_access_token");
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -73,7 +83,31 @@ function DashboardContent() {
 
   // Get reports from backend
   useEffect(() => {
+    let stopTimer;
+    const startTimer = window.setTimeout(() => {
+      if (sessionStorage.getItem("workspace_navigation") === pathname) {
+        sessionStorage.removeItem("workspace_navigation");
+        setNavigationLoading(true);
+        stopTimer = window.setTimeout(() => setNavigationLoading(false), 1000);
+      }
+    }, 0);
+
+    return () => {
+      window.clearTimeout(startTimer);
+      window.clearTimeout(stopTimer);
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    let activeRequest = true;
+
     const fetchReports = async () => {
+      const token = localStorage.getItem("research_access_token");
+      if (!token) {
+        setAuthenticated(false);
+        return;
+      }
+
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/reports`,
@@ -82,6 +116,8 @@ function DashboardContent() {
 
         const list = response.data.reports || response.data;
 
+        if (!activeRequest) return;
+        setAuthenticated(true);
         setReports(list);
         saveReports(list);
 
@@ -105,6 +141,13 @@ function DashboardContent() {
           setMode("list");
         }
       } catch (err) {
+        if (!activeRequest) return;
+        if (err.response?.status === 401) {
+          localStorage.removeItem("research_access_token");
+          localStorage.removeItem("research_user");
+          setAuthenticated(false);
+          return;
+        }
         console.error("Error fetching reports:", err);
 
         // Fallback to locally stored reports
@@ -135,6 +178,9 @@ function DashboardContent() {
     };
 
     fetchReports();
+    return () => {
+      activeRequest = false;
+    };
   }, [params]);
 
   // Create new report
@@ -198,20 +244,70 @@ function DashboardContent() {
     }
   }
 
+  const deleteReport = async () => {
+    if (!reportToDelete || deletingReport) return;
+
+    setDeletingReport(true);
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/reports/${reportToDelete.id}`,
+        { headers: authorizationHeaders() },
+      );
+      const updatedReports = reports.filter(
+        (report) => String(report.id) !== String(reportToDelete.id),
+      );
+      setReports(updatedReports);
+      saveReports(updatedReports);
+      if (String(active) === String(reportToDelete.id)) {
+        setActive(null);
+        setMode(updatedReports.length ? "list" : "home");
+        router.replace("/dashboard");
+      }
+      setNotice(`"${reportToDelete.title}" was deleted successfully.`);
+      setNoticeType("success");
+      setReportToDelete(null);
+    } catch (error) {
+      setNotice(
+        error.response?.data?.message ||
+          "Unable to delete this report. Please try again.",
+      );
+      setNoticeType("error");
+    } finally {
+      setDeletingReport(false);
+    }
+  };
+
   return (
     <div className="min-h-screen md:flex">
 
       {/* Sidebar */}
-      <Sidebar
-        reports={reports}
-        activeId={active}
-        onNew={goNew}
-        onSelect={select}
-      />
+      {authenticated && <Sidebar />}
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0">
+      <main className="relative min-h-screen flex-1 min-w-0">
+        {navigationLoading && (
+          <Loader fullscreen={false} text="Loading dashboard..." />
+        )}
 
+        {authenticated === null ? (
+          <Loader fullscreen={false} text="Checking your session..." />
+        ) : authenticated === false ? (
+          <div className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center px-6 text-center">
+            <h1 className="text-3xl font-bold">Sign in to continue</h1>
+            <p className="mt-3 text-sm leading-6 text-muted">
+              Sign in to access your dashboard and saved research reports.
+            </p>
+            <Link href="/signin" className="primary mt-6">
+              Go to Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="mt-4 text-sm font-semibold text-primary-500 hover:underline"
+            >
+              Create an account
+            </Link>
+          </div>
+        ) : (
         <AnimatePresence mode="wait">
 
           {/* Research Home */}
@@ -319,61 +415,52 @@ function DashboardContent() {
                 >
                   {reports.map((r, index) => (
 
-                    <motion.button
+                    <motion.article
                       variants={itemVariants}
                       whileHover={{
                         y: -6,
-                        scale: 1.01,
                       }}
-                      whileTap={{
-                        scale: 0.98,
-                      }}
-                      onClick={() => select(r.id)}
                       key={r.id}
-                      className="soft-card text-left p-6 hover:border-[#b5d3d4] hover:shadow-sm transition-all duration-300"
+                      className="soft-card group relative p-6 hover:border-[#b5d3d4] hover:shadow-sm transition-all duration-300"
                     >
-
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{
-                          delay: index * 0.08,
-                        }}
+                      <button
+                        type="button"
+                        onClick={() => select(r.id)}
+                        aria-label={`Open report: ${r.title}`}
+                        className="w-full text-left"
                       >
-                        <FileText
-                          size={22}
-                          className="text-teal mb-4"
-                        />
-                      </motion.div>
-
-                      <h2 className="font-bold text-lg line-clamp-2">
-                        {r.title}
-                      </h2>
-
-                      <p className="text-sm text-muted mt-2 line-clamp-3">
-                        {r.introduction}
-                      </p>
-
-                      <div className="flex justify-between items-center mt-5 text-xs text-muted">
-
-                        <span>
-                          {new Date(
-                            r.createdAt
-                          ).toLocaleDateString()}
-                        </span>
-
-                        <motion.span
-                          whileHover={{ x: 5 }}
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.08 }}
                         >
-                          <ArrowRight
-                            size={18}
-                            className="text-teal"
-                          />
-                        </motion.span>
-
-                      </div>
-
-                    </motion.button>
+                          <FileText size={22} className="text-teal mb-4" />
+                        </motion.div>
+                        <h2 className="font-bold text-lg line-clamp-2">
+                          {r.title}
+                        </h2>
+                        <p className="text-sm text-muted mt-2 line-clamp-3">
+                          {r.introduction}
+                        </p>
+                        <div className="flex justify-between items-center mt-5 text-xs text-muted">
+                          <span>
+                            {r.createdAt &&
+                            !Number.isNaN(new Date(r.createdAt).getTime())
+                              ? new Date(r.createdAt).toLocaleDateString()
+                              : "Date unavailable"}
+                          </span>
+                          <ArrowRight size={18} className="text-teal" />
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReportToDelete(r)}
+                        aria-label={`Delete report: ${r.title}`}
+                        className="absolute right-4 top-4 rounded-lg p-2 text-slate-400 transition hover:bg-red-500/10 hover:text-red-400"
+                      >
+                        <Trash2 size={17} aria-hidden="true" />
+                      </button>
+                    </motion.article>
 
                   ))}
                 </motion.div>
@@ -428,8 +515,50 @@ function DashboardContent() {
           )}
 
         </AnimatePresence>
-
+        )}
       </main>
+      <Toast
+        message={notice}
+        type={noticeType}
+        show={!!notice}
+        onClose={() => setNotice("")}
+      />
+      {reportToDelete && (
+        <div className="fixed inset-0 z-100 grid place-items-center bg-slate-950/75 px-4 backdrop-blur-sm">
+          <section
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-report-title"
+            className="w-full max-w-md rounded-2xl border border-red-400/25 bg-slate-900 p-6 shadow-2xl"
+          >
+            <h2 id="delete-report-title" className="text-lg font-bold">
+              Delete this report?
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              “{reportToDelete.title}” will be permanently deleted.
+            </p>
+            <div className="mt-7 flex justify-end gap-3">
+              <button
+                type="button"
+                disabled={deletingReport}
+                onClick={() => setReportToDelete(null)}
+                className="secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deletingReport}
+                onClick={deleteReport}
+                className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500"
+              >
+                <Trash2 size={16} aria-hidden="true" />
+                {deletingReport ? "Deleting..." : "Delete report"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
     </div>
   );

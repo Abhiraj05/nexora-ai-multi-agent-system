@@ -3,9 +3,13 @@
 import { motion } from "framer-motion";
 import { Microscope } from "lucide-react";
 
-export default function Loader({ text = "Loading..." }) {
+export default function Loader({ text = "Loading...", fullscreen = true }) {
   return (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-slate-950">
+    <div
+      className={`${fullscreen ? "fixed inset-0 z-9999" : "absolute inset-0 z-40"} flex items-center justify-center bg-slate-950`}
+      role="status"
+      aria-live="polite"
+    >
       {/* Background Glow */}
       <motion.div
         animate={{
