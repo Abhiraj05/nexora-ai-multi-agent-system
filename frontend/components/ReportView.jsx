@@ -47,7 +47,7 @@ export default function ReportView({ report, onBack }) {
     URL.revokeObjectURL(url);
   };
   return (
-    <article className="max-w-[850px] mx-auto px-5 py-12 md:py-16">
+    <article className="max-w-212.5 mx-auto px-5 py-12 md:py-16">
       <div className="flex justify-between gap-3 mb-8">
         <button
           onClick={onBack}
@@ -89,7 +89,7 @@ export default function ReportView({ report, onBack }) {
             {Array.isArray(report[key]) ? (
               <ul className="space-y-3 list-disc pl-5 text-[#536b69] leading-7">
                 {report[key].map((item, i) => (
-                  <li key={i} className="break-words">
+                  <li key={i} className="wrap-break-word">
                     {item}
                   </li>
                 ))}

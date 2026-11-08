@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { LockKeyhole, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import AuthShell from "@/components/AuthShell";
-import Loader from "@/components/Loader";
+import Toast from "@/components/Toast";
 
 export default function ResetPassword() {
   const router = useRouter();
@@ -17,14 +17,6 @@ export default function ResetPassword() {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
- const [loading, setLoading] = useState(false);
-  const handleNavigate = (route) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      router.push(route);
-    }, 2000);
-  };
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 25 },
@@ -90,7 +82,7 @@ export default function ResetPassword() {
       const response = await axios.post(
         "/api/auth/reset-password",
         {
-          email,
+          email: email.trim().toLowerCase(),
           reset_token: resetToken,
           new_password: password,
         },
@@ -120,15 +112,17 @@ export default function ResetPassword() {
   };
 
   return (
-     <>
-      {loading && <Loader />}
-
-      {!loading && (
     <AuthShell
       eyebrow="SECURE YOUR ACCOUNT"
       title="Set new password"
       description="Choose a strong new password to secure your account."
     >
+      <Toast
+        message={error}
+        type="error"
+        show={!!error}
+        onClose={() => setError("")}
+      />
       <motion.form
         onSubmit={handleSubmit}
         variants={containerVariants}
@@ -153,7 +147,6 @@ export default function ResetPassword() {
               value={password}
               onChange={handleChange}
               minLength={8}
-              required
             />
 
             <button
@@ -185,7 +178,6 @@ export default function ResetPassword() {
               placeholder="Confirm your password"
               value={confirm}
               onChange={handleChange}
-              required
             />
 
             <button
@@ -221,18 +213,6 @@ export default function ResetPassword() {
           </motion.div>
         )}
 
-        {/* Error Message */}
-        {error && (
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            role="alert"
-            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600"
-          >
-            {error}
-          </motion.p>
-        )}
-
         {/* Submit Button */}
         <motion.button
           type="submit"
@@ -255,7 +235,6 @@ export default function ResetPassword() {
         </motion.button>
 
       </motion.form>
-    </AuthShell> )}
-    </>
+    </AuthShell>
   );
 }

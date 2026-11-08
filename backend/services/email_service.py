@@ -2,13 +2,27 @@ import os
 import smtplib
 import ssl
 from email.message import EmailMessage
+from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+
+_template_environment = Environment(
+    loader=FileSystemLoader(Path(__file__).resolve().parents[1] / "templates"),
+    autoescape=select_autoescape(("html", "xml")),
+)
 
 
 class EmailDeliveryError(Exception):
     pass
 
 
-def send_password_reset_code(email: str, otp: str) -> None:
+def _send_email(
+    recipient: str,
+    subject: str,
+    body: str,
+    html_body: str | None = None,
+) -> None:
     host = os.environ.get("SMTP_HOST")
     port_value = os.environ.get("SMTP_PORT", "587")
     username = os.environ.get("SMTP_USERNAME")
@@ -21,13 +35,12 @@ def send_password_reset_code(email: str, otp: str) -> None:
     try:
         port = int(port_value)
         message = EmailMessage()
-        message["Subject"] = "Your password reset code"
+        message["Subject"] = subject
         message["From"] = sender
-        message["To"] = email
-        message.set_content(
-            f"Your password reset code is {otp}. "
-            "It expires in 10 minutes. If you did not request this, ignore this email."
-        )
+        message["To"] = recipient
+        message.set_content(body)
+        if html_body is not None:
+            message.add_alternative(html_body, subtype="html")
 
         with smtplib.SMTP(host, port, timeout=10) as server:
             server.ehlo()
@@ -36,4 +49,88 @@ def send_password_reset_code(email: str, otp: str) -> None:
             server.login(username, password)
             server.send_message(message)
     except (OSError, ValueError, smtplib.SMTPException) as error:
-        raise EmailDeliveryError("Could not deliver the password reset email.") from error
+        raise EmailDeliveryError("Could not deliver the email.") from error
+
+
+def _render_email(template_name: str, **context: str) -> str:
+    return _template_environment.get_template(template_name).render(**context)
+
+
+def send_signup_success(email: str, username: str) -> None:
+    message = "Your account has been created successfully."
+    _send_email(
+        email,
+        "Welcome",
+        f"Hello {username},\n\n{message}",
+        _render_email(
+            "emails/signup_success.html",
+            username=username,
+            email=email,
+            message=message,
+        ),
+    )
+
+
+def send_password_reset_code(email: str, otp: str, user_name: str) -> None:
+    message_text = "Use this one-time password to reset your password."
+    _send_email(
+        email,
+        "Reset Your Password",
+        f"""Hello {user_name},
+
+We received a request to reset your password.
+
+{message_text}
+
+OTP: {otp}
+
+This code expires in 10 minutes. If you did not request a password reset, you can ignore this email.
+""",
+        _render_email(
+            "emails/otp.html",
+            username=user_name,
+            email=email,
+            message=message_text,
+            otp=otp,
+        ),
+    )
+
+
+def send_password_reset_success(email: str, user_name: str) -> None:
+    message_text = (
+        "Your password has been reset successfully. You can now sign in "
+        "using your new password. If you did not make this change, contact "
+        "support immediately."
+    )
+    _send_email(
+        email,
+        "Password Reset Successful",
+        f"""Hello {user_name},
+
+{message_text}
+""",
+        _render_email(
+            "emails/password_reset_success.html",
+            username=user_name,
+            email=email,
+            message=message_text,
+        ),
+    )
+
+
+def send_feedback_email(username: str, email: str, message: str) -> None:
+    recipient = os.environ.get("FEEDBACK_RECIPIENT_EMAIL")
+    if not recipient:
+        raise EmailDeliveryError("FEEDBACK_RECIPIENT_EMAIL is not configured.")
+
+    _send_email(
+        recipient,
+        "New Feedback",
+        f"Feedback from {username} ({email}):\n\n{message}",
+        _render_email(
+            "emails/feedback.html",
+            username=username,
+            email=email,
+            message=message,
+        ),
+    )

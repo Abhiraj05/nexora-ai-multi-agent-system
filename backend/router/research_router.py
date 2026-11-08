@@ -1,4 +1,5 @@
 from flask import Blueprint, abort, current_app, jsonify, request
+from agent.research_agent import research_team
 
 research_router = Blueprint("research", __name__, url_prefix="/api")
 
@@ -6,17 +7,15 @@ research_router = Blueprint("research", __name__, url_prefix="/api")
 @research_router.post("/research")
 async def research_route():
     data = request.get_json(silent=True)
-    if not isinstance(data, dict):
+    if not data:
         abort(400, description="'topic' must be a non-empty string")
 
-    topic = data.get("topic", "")
-    if not isinstance(topic, str) or not topic.strip():
+    topic = data.get("topic")
+    if not topic:
         abort(400, description="'topic' must be a non-empty string")
 
     try:
-        from agent.research_agent import research_team
-
-        result = await research_team.run(task=topic.strip())
+        result = await research_team.run(task=topic)
         report = result.messages[-1].content
         return jsonify(report.model_dump(mode="json"))
     except Exception:

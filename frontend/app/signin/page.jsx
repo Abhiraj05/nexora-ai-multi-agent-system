@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import axios from "axios";
 import AuthShell from "@/components/AuthShell";
 import Loader from "@/components/Loader";
+import Toast from "@/components/Toast";
 import { setUser } from "@/lib/store";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Signin() {
   const router = useRouter();
@@ -66,7 +66,8 @@ export default function Signin() {
     e.preventDefault();
     setError("");
 
-    if (!email.trim()) {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
       setError("Please enter your email address.");
       return;
     }
@@ -82,7 +83,7 @@ export default function Signin() {
       const response = await axios.post(
         "/api/auth/signin",
         {
-          email: email.trim(),
+          email: normalizedEmail,
           password,
         },
         {
@@ -96,8 +97,8 @@ export default function Signin() {
 
       setUser(
         data.user || {
-          name: email.split("@")[0],
-          email,
+          name: normalizedEmail.split("@")[0],
+          email: normalizedEmail,
         },
         data.access_token,
       );
@@ -115,6 +116,13 @@ export default function Signin() {
 
   return (
     <>
+      <Toast
+        message={error}
+        type="error"
+        show={!!error}
+        onClose={() => setError("")}
+      />
+
       {loading && <Loader />}
 
       {!loading && (
@@ -144,7 +152,6 @@ export default function Signin() {
                   value={email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  required
                 />
               </div>
             </motion.label>
@@ -163,7 +170,6 @@ export default function Signin() {
                   value={password}
                   onChange={handleChange}
                   placeholder="Enter your password"
-                  required
                   minLength={8}
                 />
 
@@ -186,18 +192,6 @@ export default function Signin() {
                 Forgot password?
               </button>
             </motion.div>
-
-            {/* Error Message */}
-            {error && (
-              <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                role="alert"
-                className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600"
-              >
-                {error}
-              </motion.p>
-            )}
 
             {/* Signin Button */}
             <motion.button
@@ -222,7 +216,7 @@ export default function Signin() {
               variants={itemVariants}
               className="text-sm text-center text-muted"
             >
-              New to Research Agent?{" "}
+              New to Nexora?{" "}
               <button
                 className="text-teal font-semibold hover:underline"
                 onClick={() => handleNavigate("/signup")}

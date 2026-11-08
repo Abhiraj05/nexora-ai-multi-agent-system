@@ -1,10 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Microscope } from "lucide-react";
 
 export default function Loader({ text = "Loading..." }) {
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#f8fbfa]">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-slate-950">
       {/* Background Glow */}
       <motion.div
         animate={{
@@ -16,7 +17,7 @@ export default function Loader({ text = "Loading..." }) {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute h-64 w-64 rounded-full bg-[#44858e]/20 blur-[80px]"
+        className="absolute h-64 w-64 rounded-full bg-primary-600/20 blur-[80px]"
       />
 
       <motion.div
@@ -59,9 +60,9 @@ export default function Loader({ text = "Loading..." }) {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#44858e] text-white shadow-lg shadow-[#44858e]/25"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-600/25"
           >
-            <span className="text-lg font-bold">R</span>
+            <Microscope size={21} strokeWidth={2} aria-hidden="true" />
           </motion.div>
         </div>
 
@@ -93,7 +94,7 @@ export default function Loader({ text = "Loading..." }) {
                 delay: item * 0.15,
                 ease: "easeInOut",
               }}
-              className="h-1.5 w-1.5 rounded-full bg-[#44858e]"
+              className="h-1.5 w-1.5 rounded-full bg-primary-600"
             />
           ))}
         </div>

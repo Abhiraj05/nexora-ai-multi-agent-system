@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Microscope } from "lucide-react";
 
 export default function Navbar({ handleNavigate }) {
   return (
@@ -12,14 +13,14 @@ export default function Navbar({ handleNavigate }) {
       className="fixed top-0 z-50 w-full border-b border-[#e9eeee] bg-white/85 backdrop-blur-xl"
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-10">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#44858e] text-xl text-white">
-            ◉
-          </div>
-
+        <Link href="/" aria-label="Nexora home" className="flex items-center gap-3">
+          <span
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-600 text-white"
+          >
+            <Microscope size={23} strokeWidth={2} aria-hidden="true" />
+          </span>
           <span className="text-xl font-bold tracking-tight text-[#142625]">
-            Research<span className="text-[#44858e]">Agent</span>
+            Nexora
           </span>
         </Link>
 
@@ -59,7 +60,7 @@ export default function Navbar({ handleNavigate }) {
 
           <button
             onClick={() => handleNavigate("/signup")}
-            className="rounded-full bg-[#44858e] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#356e76] hover:shadow-md"
+            className="rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-500 hover:shadow-md"
           >
             Get Started <span className="ml-2">→</span>
           </button>

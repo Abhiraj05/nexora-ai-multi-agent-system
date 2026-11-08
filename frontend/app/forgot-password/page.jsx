@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { ArrowLeft, Send } from "lucide-react";
 import AuthShell from "@/components/AuthShell";
 import Loader from "@/components/Loader";
+import Toast from "@/components/Toast";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -56,7 +56,8 @@ export default function ForgotPassword() {
     e.preventDefault();
     setError("");
 
-    if (!email.trim()) {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
       setError("Please enter your email address.");
       return;
     }
@@ -67,7 +68,7 @@ export default function ForgotPassword() {
       const response = await axios.post(
         "/api/auth/forgot-password",
         {
-          email: email.trim(),
+          email: normalizedEmail,
         },
         {
           headers: {
@@ -77,7 +78,7 @@ export default function ForgotPassword() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        sessionStorage.setItem("reset_email", email.trim());
+        sessionStorage.setItem("reset_email", normalizedEmail);
 
         // Clear any previous OTP
         sessionStorage.removeItem("reset_otp");
@@ -96,6 +97,13 @@ export default function ForgotPassword() {
 
   return (
     <>
+      <Toast
+        message={error}
+        type="error"
+        show={!!error}
+        onClose={() => setError("")}
+      />
+
       {loading && <Loader />}
 
       {!loading && (
@@ -125,22 +133,9 @@ export default function ForgotPassword() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={handleChange}
-                  required
                 />
               </div>
             </motion.label>
-
-            {/* Error Message */}
-            {error && (
-              <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                role="alert"
-                className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600"
-              >
-                {error}
-              </motion.p>
-            )}
 
             {/* Submit Button */}
             <motion.button

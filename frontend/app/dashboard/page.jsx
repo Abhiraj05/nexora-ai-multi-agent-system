@@ -26,7 +26,6 @@ function DashboardContent() {
   const [active, setActive] = useState(null);
   const [mode, setMode] = useState("home");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const authorizationHeaders = () => {
     const token = getAccessToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -127,7 +126,6 @@ function DashboardContent() {
   const goNew = () => {
     setMode("home");
     setActive(null);
-    setError("");
 
     router.replace("/dashboard?new=1");
   };
@@ -140,25 +138,11 @@ function DashboardContent() {
     router.replace("/dashboard?id=" + id);
   };
 
-  // Research API
-  async function research(topic) {
+  // Save generated research report
+  async function research(payload) {
     setLoading(true);
-    setError("");
 
     try {
-      const response = await axios.post(
-        "/api/research",
-        {
-          topic,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const payload = response.data;
       const report = payload.report || payload;
 
       if (!validateReport(report)) {
@@ -190,13 +174,6 @@ function DashboardContent() {
       setReports(updated);
 
       select(savedReport.id);
-
-    } catch (err) {
-      setError(
-        err.response?.data?.detail ||
-          err.message ||
-          "Research generation failed."
-      );
     } finally {
       setLoading(false);
     }
@@ -230,7 +207,6 @@ function DashboardContent() {
               <ResearchHome
                 onResearch={research}
                 loading={loading}
-                error={error}
               />
             </motion.div>
           )}

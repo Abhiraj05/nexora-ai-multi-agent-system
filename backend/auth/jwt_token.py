@@ -1,22 +1,26 @@
 from datetime import datetime, timedelta, timezone
+import os
+from pathlib import Path
 from typing import Any
-
 import jwt
+from dotenv import load_dotenv
 from flask import current_app, request
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from werkzeug.exceptions import Unauthorized
-
 from sql.user_model import User
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 ALGORITHM = "HS256"
 TOKEN_LIFETIME = timedelta(hours=1)
 
 
 def _secret_key() -> str:
-    secret_key = current_app.config.get("SECRET_KEY")
+    secret_key = current_app.config.get("SECRET_KEY") or os.getenv("SECRET_KEY")
     if not secret_key:
-        raise RuntimeError("Flask SECRET_KEY must be configured to use JWT authentication.")
+        raise RuntimeError(
+            "Flask SECRET_KEY must be configured to use JWT authentication.")
     return secret_key
 
 
@@ -26,7 +30,7 @@ def create_token(data: dict[str, Any]) -> str:
     return jwt.encode(payload, _secret_key(), algorithm=ALGORITHM)
 
 
-def get_current_user(db: Session) -> User:
+def _current_user_email() -> str:
     authorization = request.headers.get("Authorization", "")
     scheme, separator, token = authorization.partition(" ")
     if scheme.lower() != "bearer" or not separator or not token:
@@ -40,8 +44,12 @@ def get_current_user(db: Session) -> User:
     email = payload.get("sub")
     if not email:
         raise Unauthorized("Token does not contain a valid subject.")
+    return email
 
-    user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
+
+async def get_current_user(db: AsyncSession) -> User:
+    email = _current_user_email()
+    user = await db.scalar(select(User).where(User.email == email))
     if user is None:
         raise Unauthorized("User associated with token was not found.")
     return user

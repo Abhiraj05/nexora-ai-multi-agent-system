@@ -1,0 +1,6 @@
+{% extends "emails/base.html" %}
+{% block title %}New feedback received{% endblock %}
+{% block content %}
+<p>A feedback message was submitted by <strong>{{ username }}</strong> (<a href="mailto:{{ email }}" style="color:#0f766e;">{{ email }}</a>).</p>
+<p style="margin:16px 0;padding:16px;background-color:#f8fafc;border-radius:8px;white-space:pre-wrap;">{{ message }}</p>
+{% endblock %}

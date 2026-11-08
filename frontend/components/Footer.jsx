@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Microscope } from "lucide-react";
 
 export default function Footer({ handleNavigate }) {
   return (
@@ -6,14 +7,13 @@ export default function Footer({ handleNavigate }) {
       <div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 md:flex-row">
         {/* Brand */}
         <div className="max-w-sm">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#44858e] text-lg text-white">
-              ◉
-            </div>
-
-            <span className="text-lg font-bold text-[#142625]">
-              Research<span className="text-[#44858e]">Agent</span>
+          <Link href="/" aria-label="Nexora home" className="flex items-center gap-3">
+            <span
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white"
+            >
+              <Microscope size={21} strokeWidth={2} aria-hidden="true" />
             </span>
+            <span className="text-lg font-bold text-[#142625]">Nexora</span>
           </Link>
 
           <p className="mt-5 text-sm leading-7 text-[#829492]">
@@ -76,7 +76,7 @@ export default function Footer({ handleNavigate }) {
 
       {/* Copyright */}
       <div className="mx-auto mt-12 max-w-7xl border-t border-[#edf0ef] pt-7 text-center text-xs text-[#9aabaa] sm:text-left">
-        © 2026 Research Agent. All rights reserved.
+        © 2026 Nexora. All rights reserved.
       </div>
     </footer>
   );

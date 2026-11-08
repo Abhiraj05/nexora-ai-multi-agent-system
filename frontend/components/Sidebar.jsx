@@ -2,12 +2,11 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Search,
+  Microscope,
   Plus,
   LogIn,
   LogOut,
   LayoutDashboard,
-  MessageSquare,
   FileText,
   ChevronRight,
 } from "lucide-react";
@@ -17,18 +16,22 @@ export default function Sidebar({ reports = [], activeId, onNew, onSelect }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setCurrentUser] = useState(null);
-  useEffect(() => setCurrentUser(getUser()), [pathname]);
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setCurrentUser(getUser()), 0);
+    return () => window.clearTimeout(timeout);
+  }, [pathname]);
   return (
-    <aside className="w-full md:w-[255px] md:min-w-[255px] md:h-screen md:sticky md:top-0 border-r border-[#edf0f0] bg-[#fafbfc] flex flex-col">
+    <aside className="w-full md:w-63.75 md:min-w-63.75 md:h-screen md:sticky md:top-0 border-r border-[#edf0f0] bg-[#fafbfc] flex flex-col">
       <Link
         href="/"
-        className="h-[74px] flex items-center gap-3 px-4 border-b border-[#edf0f0]"
+        aria-label="Nexora home"
+        className="h-18.5 flex items-center gap-3 px-4 border-b border-[#edf0f0]"
       >
-        <span className="w-10 h-10 rounded-2xl bg-teal text-white grid place-items-center">
-          <Search size={20} />
+        <span className="w-10 h-10 shrink-0 rounded-2xl bg-primary-600 text-white grid place-items-center">
+          <Microscope size={22} strokeWidth={2.25} aria-hidden="true" />
         </span>
-        <span className="font-bold text-[17px] tracking-tight">
-          Research Agent
+        <span className="font-bold text-[17px] tracking-tight text-[#142625]">
+          Nexora
         </span>
       </Link>
       <div className="p-4 flex-1 overflow-auto">

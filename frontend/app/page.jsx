@@ -106,12 +106,12 @@ export default function Home() {
       {loading && <Loader />}
 
       {!loading && (
-        <main className="min-h-screen overflow-hidden bg-[#fafbfc] text-[#142625]">
+        <main className="min-h-screen overflow-hidden text-[#142625]">
           <Navbar handleNavigate={handleNavigate} />
 
           {/* HERO SECTION */}
           <section className="relative px-6 pb-24 pt-40 lg:pt-48">
-            <div className="pointer-events-none absolute left-1/2 top-20 -z-0 h-[450px] w-[650px] -translate-x-1/2 rounded-full bg-[#e6f1f0] opacity-60 blur-[110px]" />
+            <div className="pointer-events-none absolute left-1/2 top-20 z-0 h-112.5 w-162.5 -translate-x-1/2 rounded-full bg-primary-600/10 opacity-60 blur-[110px]" />
 
             <motion.div
               initial="hidden"
@@ -131,7 +131,7 @@ export default function Home() {
               >
                 Study, Research,
                 <br />
-                <span className="bg-gradient-to-r from-[#397984] to-[#64a4a1] bg-clip-text text-transparent">
+                <span className="text-primary-500">
                   Discover Everything.
                 </span>
               </motion.h1>
@@ -151,7 +151,7 @@ export default function Home() {
               >
                 <button
                   onClick={() => handleNavigate("/signup")}
-                  className="flex items-center justify-center gap-3 rounded-full bg-[#44858e] px-9 py-4 text-sm font-semibold text-white shadow-lg shadow-[#44858e]/20 transition hover:-translate-y-1 hover:bg-[#356e76]"
+                  className="flex items-center justify-center gap-3 rounded-full bg-primary-600 px-9 py-4 text-sm font-semibold text-white shadow-lg shadow-primary-600/20 transition hover:-translate-y-1 hover:bg-primary-500"
                 >
                   Start Researching →
                 </button>
@@ -185,7 +185,7 @@ export default function Home() {
               <div className="rounded-2xl border border-[#e4ebea] bg-white p-3 shadow-[0_25px_80px_-30px_rgba(40,90,90,0.22)] sm:p-6">
                 <div className="flex items-center justify-between border-b border-[#edf0ef] pb-5">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#44858e] text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white">
                       ✦
                     </div>
 
@@ -197,7 +197,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <span className="rounded-full bg-[#eaf5ef] px-3 py-1.5 text-xs font-semibold text-[#45936b]">
+                  <span className="rounded-full bg-[#eaf5ef] px-3 py-1.5 text-xs font-semibold text-primary-600">
                     ● Ready
                   </span>
                 </div>
@@ -223,7 +223,7 @@ export default function Home() {
                       What do you want to research?
                     </span>
 
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#44858e] text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white">
                       →
                     </div>
                   </div>
@@ -353,7 +353,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-[#326e75] px-8 py-20 text-center sm:px-16"
+              className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-primary-600 px-8 py-20 text-center sm:px-16"
             >
               <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border border-white/10" />
 

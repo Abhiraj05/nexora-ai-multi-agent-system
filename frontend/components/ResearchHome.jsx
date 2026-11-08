@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import axios from "axios";
 import {
   ArrowUp,
   Globe2,
@@ -8,6 +9,7 @@ import {
   Sparkles,
   LoaderCircle,
 } from "lucide-react";
+import Toast from "@/components/Toast";
 const features = [
   {
     icon: Globe2,
@@ -28,18 +30,54 @@ const features = [
     desc: "Generate expert-level reports with citations.",
   },
 ];
-export default function ResearchHome({ onResearch, loading, error }) {
+export default function ResearchHome({ onResearch, loading }) {
   const [topic, setTopic] = useState(() =>
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search).get("topic") || ""
       : "",
   );
-  const submit = (e) => {
-    e.preventDefault();
-    if (topic.trim()) onResearch(topic.trim());
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (event) => {
+    setTopic(event.target.value);
+    setError("");
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const researchTopic = topic.trim();
+    if (!researchTopic || loading || submitting) return;
+
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await axios.post("/api/research", {
+        topic: researchTopic,
+      });
+      await onResearch(response.data);
+    } catch (err) {
+      const detail = err.response?.data?.detail || err.response?.data?.message;
+      setError(
+        typeof detail === "string"
+          ? detail
+          : err.message || "Research generation failed.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  const isLoading = loading || submitting;
+
   return (
     <div className="max-w-[900px] mx-auto px-5 pt-[115px] md:pt-[194px] pb-20">
+      <Toast
+        message={error}
+        type="error"
+        show={!!error}
+        onClose={() => setError("")}
+      />
       <div className="text-center">
         <span className="inline-flex items-center gap-2 bg-[#eaf2f2] text-teal text-[11px] font-bold tracking-[.15em] rounded-full px-3 py-1">
           <Sparkles size={13} /> AI-POWERED RESEARCH
@@ -55,13 +93,13 @@ export default function ResearchHome({ onResearch, loading, error }) {
         </p>
       </div>
       <form
-        onSubmit={submit}
+        onSubmit={handleSubmit}
         className="mt-12 bg-white border border-[#e2e9e8] rounded-[18px] p-5 shadow-[0_2px_10px_rgba(0,0,0,.025)]"
       >
         <textarea
           aria-label="Research topic"
           value={topic}
-          onChange={(e) => setTopic(e.target.value)}
+          onChange={handleChange}
           placeholder="What do you want to know?"
           rows={2}
           className="w-full resize-none text-[15px] placeholder:text-[#b0bdbc] outline-none"
@@ -77,10 +115,10 @@ export default function ResearchHome({ onResearch, loading, error }) {
             <Globe2 size={18} />
             <button
               type="submit"
-              disabled={!topic.trim() || loading}
+              disabled={!topic.trim() || isLoading}
               className="rounded-full bg-[#e9f1f1] text-teal w-10 h-10 grid place-items-center hover:bg-[#d6e9e9]"
             >
-              {loading ? (
+              {isLoading ? (
                 <LoaderCircle size={18} className="animate-spin" />
               ) : (
                 <ArrowUp size={19} />
@@ -89,11 +127,6 @@ export default function ResearchHome({ onResearch, loading, error }) {
           </div>
         </div>
       </form>
-      {error && (
-        <p role="alert" className="text-red-600 text-sm mt-3">
-          {error}
-        </p>
-      )}
       <div className="grid md:grid-cols-3 gap-5 mt-16">
         {features.map((f) => (
           <div key={f.title} className="soft-card p-6 min-h-[166px]">

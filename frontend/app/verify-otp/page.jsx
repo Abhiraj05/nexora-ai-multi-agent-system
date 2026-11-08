@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import AuthShell from "@/components/AuthShell";
 import Loader from "@/components/Loader";
+import Toast from "@/components/Toast";
 import { ShieldCheck, RefreshCw, ArrowLeft } from "lucide-react";
 
 function VerifyOTPContent() {
@@ -34,14 +35,13 @@ function VerifyOTPContent() {
   };
   // Get email from URL or sessionStorage
   useEffect(() => {
-    const queryEmail = searchParams.get("email");
+    const timeout = window.setTimeout(() => {
+      const queryEmail = searchParams.get("email");
+      const storedEmail = sessionStorage.getItem("reset_email");
+      setEmail((queryEmail || storedEmail || "").trim().toLowerCase());
+    }, 0);
 
-    const storedEmail =
-      typeof window !== "undefined"
-        ? sessionStorage.getItem("reset_email")
-        : "";
-
-    setEmail(queryEmail || storedEmail || "");
+    return () => window.clearTimeout(timeout);
   }, [searchParams]);
 
   // Countdown timer
@@ -176,7 +176,7 @@ function VerifyOTPContent() {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-otp`,
         {
-          email,
+          email: email.trim().toLowerCase(),
           otp: enteredOtp,
         },
       );
@@ -226,7 +226,7 @@ function VerifyOTPContent() {
       setResending(true);
 
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/resend-otp`, {
-        email,
+        email: email.trim().toLowerCase(),
       });
 
       setOtp(["", "", "", "", "", ""]);
@@ -250,6 +250,16 @@ function VerifyOTPContent() {
 
   return (
     <>
+      <Toast
+        message={error || status}
+        type={error ? "error" : "success"}
+        show={!!(error || status)}
+        onClose={() => {
+          setError("");
+          setStatus("");
+        }}
+      />
+
       {loading && <Loader />}
 
       {!loading && (
@@ -274,7 +284,7 @@ function VerifyOTPContent() {
               <h1 className="text-3xl font-bold mt-3">Verify your OTP</h1>
 
               <p className="text-muted mt-3 leading-relaxed">
-                We've sent a verification code to your email address. Enter the
+                We&apos;ve sent a verification code to your email address. Enter the
                 6-digit code below to continue.
               </p>
             </motion.div>
@@ -327,30 +337,6 @@ function VerifyOTPContent() {
                   ))}
                 </div>
 
-                {/* Error */}
-                {error && (
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    role="alert"
-                    className="text-sm text-red-500 mt-4"
-                  >
-                    {error}
-                  </motion.p>
-                )}
-
-                {/* Success */}
-                {status && (
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    role="status"
-                    className="text-sm text-teal mt-4"
-                  >
-                    {status}
-                  </motion.p>
-                )}
-
                 {/* Verify Button */}
                 <motion.button
                   type="submit"
@@ -367,7 +353,7 @@ function VerifyOTPContent() {
 
               {/* Resend OTP */}
               <div className="mt-6 text-center">
-                <p className="text-sm text-muted">Didn't receive the code?</p>
+                <p className="text-sm text-muted">Didn&apos;t receive the code?</p>
 
                 <motion.button
                   type="button"

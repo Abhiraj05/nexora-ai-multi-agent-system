@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { getReports } from "@/lib/store";
 import { MessageSquare, Send } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
+import Toast from "@/components/Toast";
 
 export default function Feedback() {
   const router = useRouter();
-  const [reports, setReports] = useState([]),
-    [name, setName] = useState(""),
+  const [name, setName] = useState(""),
     [email, setEmail] = useState(""),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
-    [status, setStatus] = useState("");
+    [status, setStatus] = useState(""),
+    [statusType, setStatusType] = useState("success");
   const [loading, setLoading] = useState(false);
   const handleNavigate = (route) => {
     setLoading(true);
@@ -26,8 +26,6 @@ export default function Feedback() {
       router.push(route);
     }, 2000);
   };
-  useEffect(() => setReports(getReports()), []);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -62,16 +60,18 @@ export default function Feedback() {
 
     try {
       const response = await axios.post("/api/feedback", {
-        name,
-        email,
-        message,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        message: message.trim(),
       });
 
       if (response.status === 200 || response.status === 201) {
+        setStatusType("success");
         setStatus("Feedback sent successfully!");
         setMessage("");
       }
     } catch (err) {
+      setStatusType("error");
       setStatus(
         err.response?.data?.detail ||
           err.response?.data?.message ||
@@ -85,6 +85,13 @@ export default function Feedback() {
 
   return (
     <>
+      <Toast
+        message={status}
+        type={statusType}
+        show={!!status}
+        onClose={() => setStatus("")}
+      />
+
       {loading && <Loader />}
 
       {!loading && (
@@ -102,7 +109,7 @@ export default function Feedback() {
                   variants={itemVariants}
                   className="inline-flex items-center gap-2 bg-[#eaf3f3] text-teal rounded-full px-3 py-1 text-xs font-bold"
                 >
-                  <MessageSquare size={14} /> WE'D LOVE TO HEAR FROM YOU
+                  <MessageSquare size={14} /> WE&apos;D LOVE TO HEAR FROM YOU
                 </motion.span>
 
                 <motion.h1
@@ -136,7 +143,6 @@ export default function Feedback() {
                       className="field mt-2"
                       value={name}
                       onChange={handleChange}
-                      required
                       placeholder="Your name"
                     />
                   </motion.label>
@@ -152,7 +158,6 @@ export default function Feedback() {
                       className="field mt-2"
                       value={email}
                       onChange={handleChange}
-                      required
                       placeholder="you@example.com"
                     />
                   </motion.label>
@@ -167,21 +172,9 @@ export default function Feedback() {
                       className="field mt-2 min-h-[160px] resize-y"
                       value={message}
                       onChange={handleChange}
-                      required
                       placeholder="Tell us what you think..."
                     />
                   </motion.label>
-
-                  {status && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      role="status"
-                      className="text-sm text-teal"
-                    >
-                      {status}
-                    </motion.p>
-                  )}
 
                   <motion.button
                     whileHover={{ scale: 1.02 }}

@@ -1,15 +1,70 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #7c3aed;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+}
+
 * {
   box-sizing: border-box;
 }
-body {
-  background: #fafbfc;
-  color: #142625;
+
+html {
+  color-scheme: dark;
 }
+
+body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+.app-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #020617;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+[class~="bg-white"],
+[class*="bg-white/"],
+[class*="bg-[#"] {
+  background-color: rgb(15 23 42 / 0.88) !important;
+}
+
+[class*="bg-[#44858e]"],
+[class*="bg-[#326e75]"] {
+  background-color: var(--color-primary-600) !important;
+}
+
+[class*="text-[#"] {
+  color: #cbd5e1 !important;
+}
+
+[class*="text-[#44858e]"],
+[class*="text-[#326e75]"],
+[class*="text-[#397984]"],
+[class*="text-[#64a4a1]"] {
+  color: var(--color-primary-500) !important;
+}
+
+[class*="border-[#"] {
+  border-color: rgb(148 163 184 / 0.24) !important;
+}
+
 button,
 input,
 textarea {
-  outline-color: #44858e;
+  outline-color: var(--color-primary-500);
 }
 button {
   transition: all 0.18s ease;
@@ -19,45 +74,45 @@ button:disabled {
   opacity: 0.55;
 }
 .soft-card {
-  background: #fff;
-  border: 1px solid #edf0f0;
+  background: rgb(15 23 42 / 0.88);
+  border: 1px solid rgb(148 163 184 / 0.24);
   border-radius: 18px;
 }
 .field {
   width: 100%;
-  border: 1px solid #e0e7e6;
+  border: 1px solid rgb(148 163 184 / 0.3);
   border-radius: 12px;
-  background: #fff;
+  background: rgb(15 23 42 / 0.92);
   padding: 13px 15px;
-  color: #142625;
+  color: #e2e8f0;
 }
 .field:focus {
-  outline: 2px solid #b8d7da;
-  border-color: #44858e;
+  outline: 2px solid rgb(100 164 161 / 0.4);
+  border-color: var(--color-primary-500);
 }
 .primary {
-  background: #44858e;
+  background: var(--color-primary-600);
   color: white;
   border-radius: 11px;
   padding: 12px 18px;
   font-weight: 600;
 }
 .primary:hover {
-  background: #346f78;
+  background: var(--color-primary-500);
 }
 .secondary {
-  border: 1px solid #d8e4e3;
+  border: 1px solid rgb(148 163 184 / 0.3);
   border-radius: 12px;
   padding: 11px 16px;
-  color: #44858e;
-  background: white;
+  color: var(--color-primary-500);
+  background: rgb(15 23 42 / 0.88);
 }
 .secondary:hover {
-  background: #f0f7f7;
+  background: rgb(30 41 59 / 0.95);
 }
 .section-heading {
   font-size: 19px;
   font-weight: 700;
-  color: #172e2c;
+  color: #f1f5f9;
   margin-bottom: 12px;
 }

@@ -3,8 +3,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
@@ -14,16 +15,18 @@ class Base(DeclarativeBase):
 
 
 def configure_database(app: Flask) -> None:
-    from sql import PasswordResetCode, Report, User
+    from sql import Report, User
 
     database_url = os.environ.get("DATABASE_URL")
     if not database_url or not database_url.startswith("postgresql"):
         raise RuntimeError("Set DATABASE_URL to a PostgreSQL connection URL in backend/.env.")
 
-    engine = create_engine(database_url)
-    Base.metadata.create_all(engine)
-    app.extensions["db_session_factory"] = sessionmaker(
-        bind=engine,
+    async_database_url = make_url(database_url).set(
+        drivername="postgresql+psycopg",
+    )
+    async_engine = create_async_engine(async_database_url)
+    app.extensions["async_db_session_factory"] = async_sessionmaker(
+        bind=async_engine,
         autoflush=False,
         expire_on_commit=False,
     )
