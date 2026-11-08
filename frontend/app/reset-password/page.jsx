@@ -80,7 +80,7 @@ export default function ResetPassword() {
       }
 
       const response = await axios.post(
-        "/api/auth/reset-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/update-password`,
         {
           email: email.trim().toLowerCase(),
           reset_token: resetToken,

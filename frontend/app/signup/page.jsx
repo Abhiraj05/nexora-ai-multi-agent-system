@@ -85,7 +85,7 @@ export default function Signup() {
 
     try {
       await axios.post(
-        "/api/auth/signup",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`,
         {
           name: name.trim(),
           email: email.trim().toLowerCase(),

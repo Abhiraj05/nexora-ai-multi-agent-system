@@ -59,11 +59,14 @@ export default function Feedback() {
     setStatus("");
 
     try {
-      const response = await axios.post("/api/feedback", {
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        message: message.trim(),
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/feedback`,
+        {
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          message: message.trim(),
+        },
+      );
 
       if (response.status === 200 || response.status === 201) {
         setStatusType("success");

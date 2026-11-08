@@ -53,9 +53,14 @@ export default function ResearchHome({ onResearch, loading }) {
     setError("");
 
     try {
-      const response = await axios.post("/api/research", {
-        topic: researchTopic,
-      });
+      const token = localStorage.getItem("research_access_token");
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/research`,
+        { topic: researchTopic },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        },
+      );
       await onResearch(response.data);
     } catch (err) {
       const detail = err.response?.data?.detail || err.response?.data?.message;
@@ -71,7 +76,7 @@ export default function ResearchHome({ onResearch, loading }) {
   const isLoading = loading || submitting;
 
   return (
-    <div className="max-w-[900px] mx-auto px-5 pt-[115px] md:pt-[194px] pb-20">
+    <div className="max-w-225 mx-auto px-5 pt-28.75 md:pt-48.5 pb-20">
       <Toast
         message={error}
         type="error"
@@ -87,7 +92,7 @@ export default function ResearchHome({ onResearch, loading }) {
           <br />
           <span className="text-teal">Discover Everything.</span>
         </h1>
-        <p className="text-muted text-[16px] md:text-[17px] leading-8 max-w-[550px] mx-auto mt-5">
+        <p className="text-muted text-[16px] md:text-[17px] leading-8 max-w-137.5 mx-auto mt-5">
           Deploy advanced AI agents to synthesize knowledge from the entire web
           in seconds.
         </p>
@@ -129,7 +134,7 @@ export default function ResearchHome({ onResearch, loading }) {
       </form>
       <div className="grid md:grid-cols-3 gap-5 mt-16">
         {features.map((f) => (
-          <div key={f.title} className="soft-card p-6 min-h-[166px]">
+          <div key={f.title} className="soft-card p-6 min-h-41.5">
             <f.icon className={f.color} size={23} />
             <h3 className="font-bold text-[16px] mt-4 mb-2">{f.title}</h3>
             <p className="text-muted text-[13px] leading-6">{f.desc}</p>

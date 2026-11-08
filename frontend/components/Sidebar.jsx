@@ -10,14 +10,21 @@ import {
   FileText,
   ChevronRight,
 } from "lucide-react";
-import { getUser, clearUser } from "@/lib/store";
 import { useEffect, useState } from "react";
 export default function Sidebar({ reports = [], activeId, onNew, onSelect }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setCurrentUser] = useState(null);
   useEffect(() => {
-    const timeout = window.setTimeout(() => setCurrentUser(getUser()), 0);
+    const timeout = window.setTimeout(() => {
+      try {
+        setCurrentUser(
+          JSON.parse(localStorage.getItem("research_user") || "null"),
+        );
+      } catch {
+        setCurrentUser(null);
+      }
+    }, 0);
     return () => window.clearTimeout(timeout);
   }, [pathname]);
   return (
@@ -92,7 +99,9 @@ export default function Sidebar({ reports = [], activeId, onNew, onSelect }) {
         {user ? (
           <button
             onClick={() => {
-              clearUser();
+              localStorage.removeItem("research_user");
+              localStorage.removeItem("research_access_token");
+              localStorage.removeItem("research_reports");
               setCurrentUser(null);
               router.push("/");
             }}

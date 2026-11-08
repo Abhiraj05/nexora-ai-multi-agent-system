@@ -7,7 +7,6 @@ import axios from "axios";
 import AuthShell from "@/components/AuthShell";
 import Loader from "@/components/Loader";
 import Toast from "@/components/Toast";
-import { setUser } from "@/lib/store";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Signin() {
@@ -81,7 +80,7 @@ export default function Signin() {
 
     try {
       const response = await axios.post(
-        "/api/auth/signin",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/signin`,
         {
           email: normalizedEmail,
           password,
@@ -95,13 +94,18 @@ export default function Signin() {
 
       const data = response.data;
 
-      setUser(
-        data.user || {
-          name: normalizedEmail.split("@")[0],
-          email: normalizedEmail,
-        },
-        data.access_token,
+      localStorage.setItem(
+        "research_user",
+        JSON.stringify(
+          data.user || {
+            name: normalizedEmail.split("@")[0],
+            email: normalizedEmail,
+          },
+        ),
       );
+      if (data.access_token) {
+        localStorage.setItem("research_access_token", data.access_token);
+      }
 
       router.push("/dashboard");
     } catch (err) {

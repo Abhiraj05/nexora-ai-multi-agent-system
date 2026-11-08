@@ -1,2 +1,0 @@
-import {NextResponse} from 'next/server';
-export async function POST(request){const payload=await request.json();const backend=process.env.BACKEND_API_URL;if(!backend)return NextResponse.json({detail:'Configure BACKEND_API_URL to enable authentication.'},{status:503});try{const response=await fetch(`${backend}/auth/signin`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});return NextResponse.json(await response.json(),{status:response.status})}catch{return NextResponse.json({detail:'Authentication service unavailable'},{status:502})}}

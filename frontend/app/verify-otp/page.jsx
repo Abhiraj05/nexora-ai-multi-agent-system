@@ -225,9 +225,10 @@ function VerifyOTPContent() {
       setStatus("");
       setResending(true);
 
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/resend-otp`, {
-        email: email.trim().toLowerCase(),
-      });
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/resend-otp`,
+        { email: email.trim().toLowerCase() },
+      );
 
       setOtp(["", "", "", "", "", ""]);
       setTimer(60);

@@ -9,14 +9,28 @@ import Sidebar from "@/components/Sidebar";
 import ResearchHome from "@/components/ResearchHome";
 import ReportView from "@/components/ReportView";
 
-import {
-  getAccessToken,
-  getReports,
-  saveReports,
-  validateReport,
-} from "@/lib/store";
-
 import { FileText, Plus, ArrowRight } from "lucide-react";
+
+const getReports = () => {
+  try {
+    return JSON.parse(localStorage.getItem("research_reports") || "[]");
+  } catch {
+    return [];
+  }
+};
+
+const saveReports = (reports) =>
+  localStorage.setItem("research_reports", JSON.stringify(reports));
+
+const validateReport = (report) =>
+  !!report &&
+  typeof report.title === "string" &&
+  ["introduction", "background", "conclusion"].every(
+    (key) => typeof report[key] === "string",
+  ) &&
+  ["key_findings", "benefits", "challenges", "references"].every((key) =>
+    Array.isArray(report[key]),
+  );
 
 function DashboardContent() {
   const router = useRouter();
@@ -27,7 +41,7 @@ function DashboardContent() {
   const [mode, setMode] = useState("home");
   const [loading, setLoading] = useState(false);
   const authorizationHeaders = () => {
-    const token = getAccessToken();
+    const token = localStorage.getItem("research_access_token");
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -61,9 +75,10 @@ function DashboardContent() {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get("/api/reports", {
-          headers: authorizationHeaders(),
-        });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/reports`,
+          { headers: authorizationHeaders() },
+        );
 
         const list = response.data.reports || response.data;
 
@@ -158,12 +173,16 @@ function DashboardContent() {
           report.createdAt || new Date().toISOString(),
       };
 
-      const savedResponse = await axios.post("/api/reports", report, {
-        headers: {
-          "Content-Type": "application/json",
-          ...authorizationHeaders(),
+      const savedResponse = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/reports`,
+        report,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...authorizationHeaders(),
+          },
         },
-      });
+      );
       const savedReport = {
         ...entry,
         ...savedResponse.data,
@@ -238,7 +257,7 @@ function DashboardContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.4 }}
-              className="max-w-[950px] mx-auto px-6 py-14"
+              className="max-w-237.5 mx-auto px-6 py-14"
             >
 
               {/* Header */}
