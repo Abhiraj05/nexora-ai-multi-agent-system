@@ -45,7 +45,7 @@ async def list_reports_route():
         abort(500, description="Failed to fetch records.")
 
 
-@reports_router.post("")
+@reports_router.post("/reports")
 async def create_report_route():
     data = request.get_json(silent=True)
     try:

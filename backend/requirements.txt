@@ -5,6 +5,6 @@ autogen-agentchat>=0.7.5,<0.8.0
 autogen-ext[openai]>=0.7.5,<0.8.0
 SQLAlchemy[asyncio]>=2.0,<3.0
 PyJWT>=2.8,<3.0
-psycopg[binary]>=3.2,<4.0
+asyncpg>=0.29,<1.0
 python-dotenv>=1.0,<2.0
 redis>=5.0,<7.0
