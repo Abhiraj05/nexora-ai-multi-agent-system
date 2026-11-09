@@ -122,7 +122,7 @@ npm run build
 ```
 
 ## System Architecture
-<img width="1570" height="659" alt="diagram-export-11-10-2026-1_03_28-AM" src="https://github.com/user-attachments/assets/3e40366c-ad01-4796-b852-3fabb6f29f5d" />
+<img width="1570" height="668" alt="Nexora AI Research Platform Architecture (1)" src="https://github.com/user-attachments/assets/b8ea9a0c-0bd7-4c9f-b397-bd28a9bc7027" />
 
 ## Screenshots of All Pages
 <img width="1920" alt="landing" src="https://github.com/user-attachments/assets/2381be1c-66a1-4707-b6df-e33592178854" />
