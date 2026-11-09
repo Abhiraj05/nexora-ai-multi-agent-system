@@ -7,12 +7,13 @@ Research uses OpenRouter models with role-specific output limits:
 - **Researcher — `liquid/lfm-3-1.7b:free` (300 tokens):** gathers concise research notes and source URLs.
 - **Analyst — `dots-studio/dots-3-note-preview:free` (200 tokens):** reviews the notes for unsupported claims and uncertainty.
 - **Writer — `dots-studio/dots-3-note-preview:free` (700 tokens):** produces the structured report with findings, benefits, challenges, and references.
-
+- **Model Type —** Both are open-source/open-weight models available on Hugging Face and accessed through the OpenRouter API.
+  
 ## Tech Stack
 
-- **Frontend:** Next.js, React, Tailwind CSS, Motion, Axios, and Lucide React.
+- **Frontend:** Next.js, Tailwind CSS, Motion, Axios, and Lucide React.
 - **Backend:** Python 3.13, Flask (async), AutoGen AgentChat, and SQLAlchemy (async).
-- **AI models:** OpenRouter-hosted models; Liquid LFM for research and Dots 3 Note Preview for analysis and report writing.
+- **AI models:** OpenRouter-hosted models available on Hugging Face; Liquid LFM for research and Dots 3 Note Preview for analysis and report writing.
 - **Data and migrations:** PostgreSQL, Redis, and Alembic.
 - **Authentication and email:** JWT-based authentication, SMTP, and a Redis-backed email worker.
 - **Development and deployment:** Docker Compose, npm, and Python `unittest`.
@@ -120,3 +121,49 @@ npm run lint
 npm run build
 ```
 ## Screenshots of All Pages
+<img width="1920" alt="landing" src="https://github.com/user-attachments/assets/2381be1c-66a1-4707-b6df-e33592178854" />
+
+<br><br>
+
+<img width="1920" alt="signup" src="https://github.com/user-attachments/assets/6b8c7ca6-15f2-4f8d-8cf0-5c3b71df68a2" />
+
+<br><br>
+
+<img width="1920" alt="signin" src="https://github.com/user-attachments/assets/03c7a456-83e9-4ba7-88b5-a338595edbea" />
+
+<br><br>
+
+<img width="1920" alt="reset password" src="https://github.com/user-attachments/assets/eacc59ed-a79e-43e5-911a-8c9932f98bed" />
+
+<br><br>
+
+<img width="1920" alt="verify otp" src="https://github.com/user-attachments/assets/40c9f47c-aac7-4002-b096-4b0e367807c8" />
+
+<br><br>
+
+<img width="1920" alt="new password" src="https://github.com/user-attachments/assets/b359a64a-6f45-499b-bb74-90dff0113b2e" />
+
+<br><br>
+
+<img width="1920" alt="contact" src="https://github.com/user-attachments/assets/9cd77e71-3031-4fd7-b7b7-6d028fdac479" />
+
+<br><br>
+
+<img width="1920" alt="chatbox" src="https://github.com/user-attachments/assets/059f74b0-ee3f-44ad-bd88-57e893af7200" />
+
+<br><br>
+
+<img width="1920" alt="dashboard" src="https://github.com/user-attachments/assets/2256d798-f2d9-493c-8152-2141694e2e1a" />
+
+<br><br>
+
+<img width="1920" alt="specific report" src="https://github.com/user-attachments/assets/a9221db6-4523-4e99-9548-fea78a391a22" />
+
+<br><br>
+
+<img width="1920" alt="profile" src="https://github.com/user-attachments/assets/9b026aba-6ad3-400e-bbd1-6c6984db619e" />
+
+
+
+
+
