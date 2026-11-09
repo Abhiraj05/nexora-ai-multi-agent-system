@@ -15,6 +15,7 @@ export default function ResetPassword() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -98,8 +99,11 @@ export default function ResetPassword() {
         sessionStorage.removeItem("reset_email");
         sessionStorage.removeItem("reset_token");
 
+        setPassword("");
+        setConfirm("");
+        setPasswordUpdated(true);
         setStatus(response.data?.message || "Password updated successfully.");
-        setTimeout(() => router.push("/signin"), 1800);
+        setTimeout(() => router.push("/signin"), 2500);
       }
 
     } catch (err) {
@@ -123,18 +127,20 @@ export default function ResetPassword() {
         message={error || status}
         type={error ? "error" : "success"}
         show={!!(error || status)}
+        duration={3000}
         onClose={() => {
           setError("");
           setStatus("");
         }}
       />
-      <motion.form
-        onSubmit={handleSubmit}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-5"
-      >
+      {!passwordUpdated && (
+        <motion.form
+          onSubmit={handleSubmit}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-5"
+        >
 
         {/* New Password */}
         <motion.label
@@ -239,7 +245,8 @@ export default function ResetPassword() {
           )}
         </motion.button>
 
-      </motion.form>
+        </motion.form>
+      )}
     </AuthShell>
   );
 }

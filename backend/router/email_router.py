@@ -1,4 +1,3 @@
-import asyncio
 from flask import Blueprint, abort, current_app, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy import select
@@ -13,7 +12,8 @@ from auth.password_reset_utils import (
 from cache.redis_client import redis_connection
 from core.otp_generator import generate_otp
 from schemas.password_reset_schemas import EmailRequest
-from services.email_service import EmailDeliveryError, send_password_reset_code
+from services.email_queue import EmailQueueError
+from services.email_service import send_password_reset_code
 from sql.user_model import User
 
 email_router = Blueprint("email", __name__, url_prefix="/api/auth")
@@ -45,8 +45,8 @@ async def _send_code():
                 pipeline.set(otp_key, hash_password(otp), ex=OTP_TTL_SECONDS)
                 pipeline.delete(password_reset_session_key(email))
                 await pipeline.execute()
-            await asyncio.to_thread(send_password_reset_code, email, otp, user_name)
-    except EmailDeliveryError as error:
+            await send_password_reset_code(email, otp, user_name)
+    except EmailQueueError as error:
         try:
             async with redis_connection() as redis:
                 await redis.delete(password_reset_otp_key(email))
@@ -54,8 +54,11 @@ async def _send_code():
             current_app.logger.exception(
                 "Could not clear undelivered password reset code.")
         current_app.logger.error(
-            "Password reset email delivery failed: %s", error)
-        abort(503, description="Could not send the verification email. Please try again later.")
+            "Password reset email queueing failed: %s", error)
+        abort(
+            503,
+            description="Could not queue the verification email. Please try again later.",
+        )
     except (KeyError, RedisError, SQLAlchemyError):
         current_app.logger.exception(
             "Could not process password reset request.")

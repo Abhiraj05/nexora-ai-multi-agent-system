@@ -62,6 +62,7 @@ export default function ResearchHome({ onResearch, loading }) {
         },
       );
       await onResearch(response.data);
+      setTopic("");
     } catch (err) {
       const detail = err.response?.data?.detail || err.response?.data?.message;
       setError(

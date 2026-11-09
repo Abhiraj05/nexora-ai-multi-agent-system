@@ -79,6 +79,12 @@ export default function ForgotPassword() {
 
       if (response.status === 200 || response.status === 201) {
         sessionStorage.setItem("reset_email", normalizedEmail);
+        sessionStorage.setItem(
+          "reset_otp_toast",
+          response.data?.message ||
+            "If an account exists for this email, a verification code has been sent.",
+        );
+        setEmail("");
 
         // Clear any previous OTP
         sessionStorage.removeItem("reset_otp");

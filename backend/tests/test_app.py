@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -81,9 +82,39 @@ class TestAsyncFlaskRoute(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.get_json()["id"], 42)
         self.assertEqual(response.get_json()["title"], report_payload["title"])
+        self.assertTrue(response.get_json()["createdAt"])
         db.add.assert_called_once()
         db.commit.assert_awaited_once()
         db.refresh.assert_awaited_once()
+
+    def test_list_reports_includes_persisted_creation_date(self):
+        created_at = "2026-11-09T09:15:00+00:00"
+        report = SimpleNamespace(
+            id=42,
+            title="Test report",
+            introduction="Introduction",
+            background="Background",
+            key_findings=["Finding"],
+            benefits=["Benefit"],
+            challenges=["Challenge"],
+            conclusion="Conclusion",
+            references=["https://example.com"],
+            created_at=datetime.fromisoformat(created_at),
+        )
+        db = AsyncMock()
+        result = MagicMock()
+        result.all.return_value = [report]
+        db.scalars.return_value = result
+        self.set_async_session_factory(db)
+
+        with patch(
+            "router.reports_router.get_current_user",
+            new=AsyncMock(return_value=SimpleNamespace(id=1)),
+        ):
+            response = self.client.get("/api/reports")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["reports"][0]["createdAt"], created_at)
 
     def test_delete_report_removes_report_owned_by_current_user(self):
         user = SimpleNamespace(id=1)

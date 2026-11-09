@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, JSON, String, Text, func
 from sqlalchemy.orm import relationship
 from db.db_connection import Base
 
@@ -16,5 +16,10 @@ class Report(Base):
     challenges = Column(JSON, nullable=False)
     conclusion = Column(Text, nullable=False)
     references = Column(JSON, nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
 
     user = relationship("User", back_populates="reports")

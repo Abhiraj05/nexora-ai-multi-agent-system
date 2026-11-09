@@ -68,11 +68,11 @@ export default function Feedback() {
         },
       );
 
-      if (response.status === 200 || response.status === 201) {
-        setStatusType("success");
-        setStatus("Feedback sent successfully!");
-        setMessage("");
-      }
+      setName("");
+      setEmail("");
+      setMessage("");
+      setStatusType("success");
+      setStatus(response.data?.message || "Feedback sent successfully!");
     } catch (err) {
       setStatusType("error");
       setStatus(
@@ -106,7 +106,7 @@ export default function Feedback() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="max-w-[610px] mx-auto"
+                className="max-w-152.5 mx-auto"
               >
                 <motion.span
                   variants={itemVariants}
@@ -172,7 +172,7 @@ export default function Feedback() {
                     Message
                     <textarea
                       name="message"
-                      className="field mt-2 min-h-[160px] resize-y"
+                      className="field mt-2 min-h-40resize-y"
                       value={message}
                       onChange={handleChange}
                       placeholder="Tell us what you think..."

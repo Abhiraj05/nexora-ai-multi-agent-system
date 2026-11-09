@@ -1,5 +1,3 @@
-import asyncio
-
 from flask import Blueprint, abort, current_app, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy import select
@@ -8,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.hash_password import hash_password, verify_password
 from auth.jwt_token import create_token, get_current_user
 from schemas.user_schemas import UserCreate, UserProfileUpdate, UserSignIn
-from services.email_service import EmailDeliveryError, send_signup_success
+from services.email_queue import EmailQueueError
+from services.email_service import send_signup_success
 from sql.user_model import User
 
 auth_router = Blueprint("auth", __name__, url_prefix="/api/auth")
@@ -55,14 +54,10 @@ async def signup_route():
         }
 
     try:
-        await asyncio.to_thread(
-            send_signup_success,
-            user_response["email"],
-            user_response["name"],
-        )
-    except EmailDeliveryError:
+        await send_signup_success(user_response["email"], user_response["name"])
+    except EmailQueueError:
         current_app.logger.exception(
-            "Could not send signup confirmation email.")
+            "Could not queue signup confirmation email.")
 
     return jsonify({
         "user": user_response,

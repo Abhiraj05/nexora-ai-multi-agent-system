@@ -39,6 +39,12 @@ function VerifyOTPContent() {
       const queryEmail = searchParams.get("email");
       const storedEmail = sessionStorage.getItem("reset_email");
       setEmail((queryEmail || storedEmail || "").trim().toLowerCase());
+
+      const sentMessage = sessionStorage.getItem("reset_otp_toast");
+      if (sentMessage) {
+        setStatus(sentMessage);
+        sessionStorage.removeItem("reset_otp_toast");
+      }
     }, 0);
 
     return () => window.clearTimeout(timeout);
@@ -181,6 +187,7 @@ function VerifyOTPContent() {
         },
       );
 
+      setOtp(["", "", "", "", "", ""]);
       setStatus(response.data?.message || "OTP verified successfully!");
 
       const resetToken = response.data?.reset_token;

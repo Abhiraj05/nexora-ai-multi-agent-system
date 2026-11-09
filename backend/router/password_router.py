@@ -1,4 +1,3 @@
-import asyncio
 from flask import Blueprint, abort, current_app, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy import select
@@ -9,7 +8,8 @@ from auth.hash_password import hash_password
 from auth.password_reset_utils import password_reset_session_key
 from cache.redis_client import redis_connection
 from schemas.password_reset_schemas import ResetPasswordRequest
-from services.email_service import EmailDeliveryError, send_password_reset_success
+from services.email_queue import EmailQueueError
+from services.email_service import send_password_reset_success
 from sql.user_model import User
 
 password_router = Blueprint("password", __name__, url_prefix="/api/auth")
@@ -63,9 +63,10 @@ async def update_password_route():
         abort(503, description="Could not process password reset.")
 
     try:
-        await asyncio.to_thread(send_password_reset_success, email, user_name)
-    except EmailDeliveryError:
-        current_app.logger.exception("Password changed, but confirmation email failed.")
+        await send_password_reset_success(email, user_name)
+    except EmailQueueError:
+        current_app.logger.exception(
+            "Password changed, but confirmation email could not be queued.")
         return jsonify({
             "message": "Password updated successfully, but the confirmation email could not be sent."
         })

@@ -112,6 +112,8 @@ export default function Signup() {
         },
       );
 
+      setName("");
+      setEmail("");
       setPassword("");
       setSuccess("Account created successfully. You can now sign in.");
     } catch (err) {

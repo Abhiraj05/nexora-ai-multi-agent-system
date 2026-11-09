@@ -3,8 +3,8 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from pathlib import Path
-
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from services.email_queue import enqueue_email
 
 
 _template_environment = Environment(
@@ -56,7 +56,7 @@ def _render_email(template_name: str, **context: str) -> str:
     return _template_environment.get_template(template_name).render(**context)
 
 
-def send_signup_success(email: str, username: str) -> None:
+def deliver_signup_success(email: str, username: str) -> None:
     message = "Your account has been created successfully."
     _send_email(
         email,
@@ -71,22 +71,22 @@ def send_signup_success(email: str, username: str) -> None:
     )
 
 
-def send_password_reset_code(email: str, otp: str, user_name: str) -> None:
+def deliver_password_reset_code(email: str, otp: str, user_name: str) -> None:
     message_text = "Use this one-time password to reset your password."
     _send_email(
         email,
         "Reset Your Password",
         f"""Hello {user_name},
 
-We received a request to reset your password.
+        We received a request to reset your password.
 
-{message_text}
+        {message_text}
 
-OTP: {otp}
+        OTP: {otp}
 
-This code expires in 10 minutes. If you did not request a password reset, you can ignore this email.
-""",
-        _render_email(
+        This code expires in 10 minutes. If you did not request a password reset, you can ignore this email.
+        """,
+                _render_email(
             "emails/otp.html",
             username=user_name,
             email=email,
@@ -96,7 +96,7 @@ This code expires in 10 minutes. If you did not request a password reset, you ca
     )
 
 
-def send_password_reset_success(email: str, user_name: str) -> None:
+def deliver_password_reset_success(email: str, user_name: str) -> None:
     message_text = (
         "Your password has been reset successfully. You can now sign in "
         "using your new password. If you did not make this change, contact "
@@ -118,7 +118,7 @@ def send_password_reset_success(email: str, user_name: str) -> None:
     )
 
 
-def send_feedback_email(username: str, email: str, message: str) -> None:
+def deliver_feedback_email(username: str, email: str, message: str) -> None:
     recipient = os.environ.get("FEEDBACK_RECIPIENT_EMAIL")
     if not recipient:
         raise EmailDeliveryError("FEEDBACK_RECIPIENT_EMAIL is not configured.")
@@ -133,4 +133,34 @@ def send_feedback_email(username: str, email: str, message: str) -> None:
             email=email,
             message=message,
         ),
+    )
+
+
+async def send_signup_success(email: str, username: str) -> None:
+    await enqueue_email("signup_success", email=email, username=username)
+
+
+async def send_password_reset_code(email: str, otp: str, user_name: str) -> None:
+    await enqueue_email(
+        "password_reset_code",
+        email=email,
+        otp=otp,
+        user_name=user_name,
+    )
+
+
+async def send_password_reset_success(email: str, user_name: str) -> None:
+    await enqueue_email(
+        "password_reset_success",
+        email=email,
+        user_name=user_name,
+    )
+
+
+async def send_feedback_email(username: str, email: str, message: str) -> None:
+    await enqueue_email(
+        "feedback",
+        username=username,
+        email=email,
+        message=message,
     )

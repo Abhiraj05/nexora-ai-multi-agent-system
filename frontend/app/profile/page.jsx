@@ -105,8 +105,8 @@ export default function ProfilePage() {
         { name: updatedName, email: updatedEmail },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      setName(data.user.name);
-      setEmail(data.user.email);
+      setName("");
+      setEmail("");
       localStorage.setItem("research_user", JSON.stringify(data.user));
       if (data.access_token) {
         localStorage.setItem("research_access_token", data.access_token);

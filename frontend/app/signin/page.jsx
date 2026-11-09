@@ -122,6 +122,8 @@ export default function Signin() {
         localStorage.setItem("research_access_token", data.access_token);
       }
 
+      setEmail("");
+      setPassword("");
       setSuccess("Signed in successfully.");
       setTimeout(() => router.push("/dashboard"), 1800);
     } catch (err) {

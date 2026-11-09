@@ -21,6 +21,7 @@ def _serialize_report(report: Report) -> dict:
         "challenges": report.challenges,
         "conclusion": report.conclusion,
         "references": report.references,
+        "createdAt": report.created_at.isoformat(),
     }
 
 
@@ -71,6 +72,7 @@ async def create_report_route():
                     challenges=payload.challenges,
                     conclusion=payload.conclusion,
                     references=payload.references,
+                    created_at=datetime.now(timezone.utc),
                 )
                 db.add(report)
                 await db.commit()
@@ -80,7 +82,6 @@ async def create_report_route():
                 raise
 
             response = _serialize_report(report)
-            response["createdAt"] = datetime.now(timezone.utc).isoformat()
             return jsonify(response), 201
     except SQLAlchemyError:
         current_app.logger.exception("Failed to create report.")

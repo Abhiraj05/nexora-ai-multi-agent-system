@@ -1,6 +1,6 @@
 # Nexora
 
-Nexora is an AI-powered research report application. The Next.js frontend connects to a Flask API for accounts, password recovery, feedback, and report persistence. Research generation uses AutoGen agents and OpenRouter-hosted models. PostgreSQL stores users and reports; Redis stores short-lived password-reset state.
+Nexora is an AI-powered research report application. The Next.js frontend connects to a Flask API for accounts, password recovery, feedback, and report persistence. Research generation uses AutoGen agents and OpenRouter-hosted models. PostgreSQL stores users and reports; Redis stores short-lived password-reset state and queues email jobs.
 
 ## Requirements
 
@@ -42,9 +42,11 @@ To run the backend with Docker Compose instead, set `SECRET_KEY` and
 docker compose up --build
 ```
 
-Compose starts the Flask API, PostgreSQL, and Redis, applies database
-migrations, and persists database/cache data in named volumes. The API listens
-at `http://127.0.0.1:5000`.
+Compose starts the Flask API, email worker, PostgreSQL, and Redis, applies
+database migrations, and persists database/cache data in named volumes. The API
+listens at `http://127.0.0.1:5000`. Email jobs are queued in Redis lists and
+rendered by the worker using Jinja2. Failed jobs are retried up to three times;
+jobs that still fail are kept in the `queue:emails:failed` Redis list.
 
 Create and activate a virtual environment, then install backend dependencies:
 
@@ -78,6 +80,11 @@ python app.py
 ```
 
 The Flask API listens at `http://127.0.0.1:5000`.
+In a second terminal from `backend`, run the email worker:
+
+```powershell
+python -m services.email_worker
+```
 
 ### 2. Configure and start the frontend
 
