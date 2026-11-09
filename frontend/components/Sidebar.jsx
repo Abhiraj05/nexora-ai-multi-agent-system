@@ -10,11 +10,13 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+// Render the dashboard sidebar.
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setCurrentUser] = useState(null);
 
+  // Remember the selected workspace destination.
   const startWorkspaceNavigation = (destination) => {
     if (pathname !== destination) {
       sessionStorage.setItem("workspace_navigation", destination);
@@ -38,14 +40,14 @@ export default function Sidebar() {
     <aside className="w-full md:w-63.75 md:min-w-63.75 md:h-screen md:sticky md:top-0 border-r border-[#edf0f0] bg-[#fafbfc] flex flex-col">
       <Link
         href="/"
-        aria-label="Nexora home"
+        aria-label="Nexora AI home"
         className="h-18.5 flex items-center gap-3 px-4 border-b border-[#edf0f0]"
       >
         <span className="w-10 h-10 shrink-0 rounded-2xl bg-primary-600 text-white grid place-items-center">
           <Microscope size={22} strokeWidth={2.25} aria-hidden="true" />
         </span>
         <span className="font-bold text-[17px] tracking-tight text-[#142625]">
-          Nexora
+          Nexora AI
         </span>
       </Link>
       <div className="p-4 flex-1 overflow-auto">

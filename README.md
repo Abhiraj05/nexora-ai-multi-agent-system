@@ -1,152 +1,122 @@
-# Nexora
+# Nexora AI
 
-Nexora is an AI-powered research report application. The Next.js frontend connects to a Flask API for accounts, password recovery, feedback, and report persistence. Research generation uses AutoGen agents and OpenRouter-hosted models. PostgreSQL stores users and reports; Redis stores short-lived password-reset state and queues email jobs.
+Nexora AI uses a team of AI agents to research topics and create concise reports with findings, benefits, challenges, and references. Users can save reports, revisit them, download them as text files, and share feedback.
+
+Research uses OpenRouter models with role-specific output limits:
+
+- **Researcher — `liquid/lfm-3-1.7b:free` (300 tokens):** gathers concise research notes and source URLs.
+- **Analyst — `dots-studio/dots-3-note-preview:free` (200 tokens):** reviews the notes for unsupported claims and uncertainty.
+- **Writer — `dots-studio/dots-3-note-preview:free` (700 tokens):** produces the structured report with findings, benefits, challenges, and references.
+
+## Tech Stack
+
+- **Frontend:** Next.js, React, Tailwind CSS, Motion, Axios, and Lucide React.
+- **Backend:** Python 3.13, Flask (async), AutoGen AgentChat, and SQLAlchemy (async).
+- **AI models:** OpenRouter-hosted models; Liquid LFM for research and Dots 3 Note Preview for analysis and report writing.
+- **Data and migrations:** PostgreSQL, Redis, and Alembic.
+- **Authentication and email:** JWT-based authentication, SMTP, and a Redis-backed email worker.
+- **Development and deployment:** Docker Compose, npm, and Python `unittest`.
+
+## API Endpoints
+
+The API base path is `/api`.
+
+| Method | Endpoint | Authentication | Description |
+|---|---|---|---|
+| `GET` | `/api/test` | No | Check API availability. |
+| `POST` | `/api/auth/signup` | No | Create an account (`name`, `email`, `password`). |
+| `POST` | `/api/auth/signin` | No | Sign in with `email` and `password`; returns an access token. |
+| `GET` | `/api/auth/profile` | Bearer token | Get the signed-in user's profile. |
+| `PATCH` | `/api/auth/profile` | Bearer token | Update the user's `name` and/or `email`. |
+| `DELETE` | `/api/auth/profile` | Bearer token | Delete the signed-in user's account. |
+| `POST` | `/api/auth/reset-password` | No | Send a password-reset verification code to an email address. |
+| `POST` | `/api/auth/resend-otp` | No | Resend a password-reset verification code. |
+| `POST` | `/api/auth/verify-otp` | No | Verify `email` and six-digit `otp`; returns a reset token. |
+| `POST` | `/api/auth/update-password` | No | Set `new_password` using `email` and the returned `reset_token`. |
+| `POST` | `/api/research` | Bearer token | Generate a report from a `topic`. |
+| `GET` | `/api/reports` | Bearer token | List the signed-in user's saved reports. |
+| `POST` | `/api/reports` | Bearer token | Save a report. Requires `title`, `introduction`, `background`, `key_findings`, `benefits`, `challenges`, `conclusion`, and `references`. |
+| `DELETE` | `/api/reports/<report_id>` | Bearer token | Delete a saved report owned by the signed-in user. |
+| `POST` | `/api/feedback` | No | Submit feedback (`name`, `email`, `message`). |
 
 ## Requirements
 
-- Python 3.10 or later
+- Docker and Docker Compose
+- Python 3.13
 - Node.js 20.9 or later and npm
-- PostgreSQL
-- Redis
-- An OpenRouter API key for research generation
-- SMTP credentials for signup, password-reset, and feedback email
+- An OpenRouter API key
 
-## Setup
+## Run
 
-### 1. Configure the backend
+1. Create `backend/.env`:
 
-From the repository root, create `backend/.env`:
+   ```env
+   SECRET_KEY=
+   DATABASE_URL=
+   OPENROUTER_API_KEY=
+   SMTP_HOST=
+   SMTP_PORT=
+   SMTP_USERNAME=
+   SMTP_PASSWORD=
+   SMTP_FROM_EMAIL=
+   FEEDBACK_RECIPIENT_EMAIL=
+   ```
 
-```env
-SECRET_KEY=replace-with-a-long-random-secret
-POSTGRES_PASSWORD=replace-with-a-strong-database-password
-DATABASE_URL=postgresql://user:password@localhost:5432/nexora
-REDIS_URL=redis://localhost:6379
-OPENROUTER_API_KEY=replace-with-your-openrouter-api-key
+2. Start the backend, PostgreSQL, Redis, and email worker:
 
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USERNAME=your-smtp-username
-SMTP_PASSWORD=your-smtp-password
-SMTP_FROM_EMAIL=verified-sender@example.com
-FEEDBACK_RECIPIENT_EMAIL=feedback-recipient@example.com
-```
+   ```powershell
+   cd backend
+   docker compose up --build
+   ```
 
-Replace the example values with credentials for your services. Keep `.env` files private and do not commit secrets.
-The backend uses only `OPENROUTER_API_KEY` for OpenRouter authentication. Research uses OpenRouter's `liquid/lfm-3-1.7b:free` model, which is listed at zero cost and supports structured outputs. Free-model availability and rate limits are controlled by OpenRouter and may change.
+   Docker Compose starts the email worker automatically. If running the backend outside Docker, start the worker in a separate terminal from `backend`:
 
-To run the backend with Docker Compose instead, set `SECRET_KEY` and
-`POSTGRES_PASSWORD` in `backend/.env`, then run from the `backend` directory:
+   ```powershell
+   .\env\Scripts\python.exe -m services.email_worker
+   ```
 
-```powershell
-docker compose up --build
-```
+3. Create `frontend/.env.local`:
 
-Compose starts the Flask API, email worker, PostgreSQL, and Redis, applies
-database migrations, and persists database/cache data in named volumes. The API
-listens at `http://127.0.0.1:5000`. Email jobs are queued in Redis lists and
-rendered by the worker using Jinja2. Failed jobs are retried up to three times;
-jobs that still fail are kept in the `queue:emails:failed` Redis list.
+   ```env
+   NEXT_PUBLIC_API_URL=http://127.0.0.1:5000/api
+   ```
 
-Create and activate a virtual environment, then install backend dependencies:
+4. In a second terminal, start the frontend:
 
-```powershell
-cd backend
-python -m venv env
-.\env\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
+   ```powershell
+   cd frontend
+   npm ci
+   npm run dev
+   ```
 
-On macOS/Linux, activate with `source env/bin/activate`.
+   Open `http://localhost:3000`.
 
-Apply the initial database migration:
+## Database migrations
+
+Docker Compose applies database migrations when the backend starts. To manage migrations manually, run commands from `backend` with `DATABASE_URL` configured:
 
 ```powershell
 .\env\Scripts\alembic.exe -c alembic.ini upgrade head
 ```
 
-For a database whose tables were created by the old `create_all()` startup behavior, do not run the initial migration against those tables. Mark the existing schema as the baseline:
+For an existing database created before Alembic migrations were introduced, mark its schema as the initial baseline before applying future migrations:
 
 ```powershell
 .\env\Scripts\alembic.exe -c alembic.ini stamp 0001_initial_schema
 ```
 
-See [backend/MIGRATIONS.md](backend/MIGRATIONS.md) before applying changes to an existing or shared database.
+## Tests
 
-Start the backend from the `backend` directory:
-
-```powershell
-python app.py
-```
-
-The Flask API listens at `http://127.0.0.1:5000`.
-In a second terminal from `backend`, run the email worker:
-
-```powershell
-python -m services.email_worker
-```
-
-### 2. Configure and start the frontend
-
-Create `frontend/.env.local`:
-
-```env
-NEXT_PUBLIC_API_URL=http://127.0.0.1:5000/api
-```
-
-`NEXT_PUBLIC_API_URL` is used by browser-side Axios calls to the Flask API, including authentication, OTP verification, feedback, reports, and research. Configure the Flask CORS allowed origin to match the frontend host when deploying outside local development.
-
-In another terminal:
-
-```powershell
-cd frontend
-npm ci
-npm run dev
-```
-
-Open `http://localhost:3000`.
-
-## API routes
-
-The JSX pages and components call the Flask API directly using Axios and `NEXT_PUBLIC_API_URL`:
-
-| Backend route | Purpose |
-| --- | --- |
-| `POST /api/auth/signup` | Create an account |
-| `POST /api/auth/signin` | Sign in |
-| `POST /api/auth/reset-password` | Send a reset OTP |
-| `POST /api/auth/verify-otp` | Verify OTP |
-| `POST /api/auth/update-password` | Set a new password |
-| `POST /api/auth/resend-otp` | Resend an OTP |
-| `POST /api/feedback` | Send feedback |
-| `GET /api/reports` | List reports for the signed-in user |
-| `POST /api/reports` | Save a report |
-| `POST /api/research` | Generate a research report |
-
-Flask also provides `GET /api/test`.
-
-## Tests and checks
-
-Run backend tests and Python compilation from the `backend` directory:
+Run backend tests from `backend`:
 
 ```powershell
 .\env\Scripts\python.exe -m unittest discover -v
-.\env\Scripts\python.exe -m compileall -q app.py auth db migrations router schemas services sql tests
 ```
 
-Run frontend lint and production build from `frontend`:
+Run frontend checks from `frontend`:
 
 ```powershell
 npm run lint
 npm run build
 ```
-
-## Database migrations
-
-Create a new revision after changing SQLAlchemy models:
-
-```powershell
-.\env\Scripts\alembic.exe -c alembic.ini revision --autogenerate -m "describe schema change"
-```
-
-Review the generated migration before applying it, then use `upgrade head`. Back up databases before migrations, especially in shared or production environments.
+## Screenshots of All Pages

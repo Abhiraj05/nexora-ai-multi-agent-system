@@ -9,6 +9,7 @@ import Loader from "@/components/Loader";
 import Toast from "@/components/Toast";
 import { Eye, EyeOff } from "lucide-react";
 
+// Render the sign-in page.
 export default function Signin() {
   const router = useRouter();
 
@@ -33,6 +34,7 @@ export default function Signin() {
     return () => window.clearTimeout(timeout);
   }, [router]);
 
+  // Navigate to the selected page.
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -40,7 +42,6 @@ export default function Signin() {
       router.push(route);
     }, 2000);
   };
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 25 },
     visible: {
@@ -62,7 +63,7 @@ export default function Signin() {
     },
   };
 
-  // Handle input changes
+  // Update the form field value.
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -75,7 +76,7 @@ export default function Signin() {
     setError("");
   };
 
-  // Handle signin submission
+  // Validate and submit the form.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -163,7 +164,7 @@ export default function Signin() {
             animate="visible"
             className="space-y-5"
           >
-            {/* Email */}
+
             <motion.label
               variants={itemVariants}
               className="block text-sm font-semibold"
@@ -181,7 +182,7 @@ export default function Signin() {
               </div>
             </motion.label>
 
-            {/* Password */}
+
             <motion.label
               variants={itemVariants}
               className="block text-sm font-semibold"
@@ -208,7 +209,7 @@ export default function Signin() {
               </div>
             </motion.label>
 
-            {/* Forgot Password */}
+
             <motion.div variants={itemVariants} className="text-right">
               <button
                 className="text-sm text-teal hover:underline"
@@ -218,7 +219,7 @@ export default function Signin() {
               </button>
             </motion.div>
 
-            {/* Signin Button */}
+
             <motion.button
               type="submit"
               whileHover={{ scale: 1.02 }}
@@ -236,7 +237,7 @@ export default function Signin() {
               )}
             </motion.button>
 
-            {/* Signup Link */}
+
             <motion.p
               variants={itemVariants}
               className="text-sm text-center text-muted"

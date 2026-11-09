@@ -10,6 +10,7 @@ import Loader from "@/components/Loader";
 
 const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`;
 
+// Render the profile page.
 export default function ProfilePage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -85,6 +86,7 @@ export default function ProfilePage() {
     };
   }, [router]);
 
+  // Save the profile changes.
   const handleSave = async (event) => {
     event.preventDefault();
     setError("");
@@ -105,8 +107,7 @@ export default function ProfilePage() {
         { name: updatedName, email: updatedEmail },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      setName("");
-      setEmail("");
+  
       localStorage.setItem("research_user", JSON.stringify(data.user));
       if (data.access_token) {
         localStorage.setItem("research_access_token", data.access_token);
@@ -122,6 +123,7 @@ export default function ProfilePage() {
     }
   };
 
+  // Delete the selected account or report.
   const handleDelete = async () => {
     setError("");
     setDeleting(true);

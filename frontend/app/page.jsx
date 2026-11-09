@@ -21,45 +21,45 @@ import Toast from "@/components/Toast";
 
 const features = [
   {
-    icon: "🌐",
-    title: "Real-time Web Research",
+    icon: "🤖",
+    title: "Multi-Agent Research",
     description:
-      "Explore the latest information from across the web and discover relevant sources for your research.",
+      "A researcher, analyst, and writer work together to turn your topic into a report.",
     color: "bg-blue-50",
   },
   {
     icon: "🔬",
-    title: "Deep Research & Analysis",
+    title: "Critical Review",
     description:
-      "Analyze complex topics, connect information, and synthesize insights from multiple perspectives.",
+      "Research notes are assessed for unsupported claims, assumptions, and uncertainty.",
     color: "bg-purple-50",
   },
   {
     icon: "✨",
-    title: "AI-Powered Reports",
+    title: "Structured Reports",
     description:
-      "Generate comprehensive research reports with structured findings, conclusions, and references.",
+      "Read an organized report with background, findings, benefits, challenges, and references.",
     color: "bg-amber-50",
   },
   {
     icon: "📚",
-    title: "Organized Research History",
+    title: "Saved Research History",
     description:
-      "Keep all your research reports organized in one place and revisit your previous discoveries.",
+      "Reports are saved to your account so you can return to them from your dashboard.",
     color: "bg-emerald-50",
   },
   {
-    icon: "⚡",
-    title: "Fast & Intelligent",
+    icon: "📄",
+    title: "Text Export",
     description:
-      "Save hours of manual research with intelligent AI agents that gather and organize information.",
+      "Download a generated report as a plain-text file.",
     color: "bg-orange-50",
   },
   {
-    icon: "📄",
-    title: "Structured Insights",
+    icon: "🔎",
+    title: "Research References",
     description:
-      "Get information presented in easy-to-understand sections with key findings, benefits, and challenges.",
+      "Review the source references included in each generated report.",
     color: "bg-pink-50",
   },
 ];
@@ -67,21 +67,21 @@ const features = [
 const steps = [
   {
     number: "01",
-    title: "Enter Your Topic",
+    title: "Choose a Topic",
     description:
-      "Simply enter the topic or question you want to research. No complicated setup required.",
+      "Enter the topic or question you want the research team to explore.",
   },
   {
     number: "02",
-    title: "AI Researches",
+    title: "Research, Review, and Write",
     description:
-      "Your AI research agent gathers information, analyzes relevant sources, and synthesizes insights.",
+      "AI researcher, analyst, and writer agents gather notes, assess uncertainty, and prepare a structured report.",
   },
   {
     number: "03",
-    title: "Get Your Report",
+    title: "Review and Save Your Report",
     description:
-      "Receive a comprehensive research report with findings, benefits, challenges, and references.",
+      "Open your saved report in the dashboard, explore its sections and references, or export it as a text file.",
   },
 ];
 
@@ -102,6 +102,7 @@ const itemVariants = {
   },
 };
 
+// Render the home page.
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -123,6 +124,7 @@ export default function Home() {
     return () => window.clearTimeout(timeout);
   }, []);
 
+  // Navigate to the selected page.
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -144,7 +146,7 @@ export default function Home() {
           />
           <Navbar handleNavigate={handleNavigate} />
 
-          {/* HERO SECTION */}
+
           <section className="relative px-6 pb-24 pt-40 lg:pt-48">
             <div className="pointer-events-none absolute left-1/2 top-20 z-0 h-112.5 w-162.5 -translate-x-1/2 rounded-full bg-primary-600/10 opacity-60 blur-[110px]" />
 
@@ -175,9 +177,8 @@ export default function Home() {
                 variants={itemVariants}
                 className="mx-auto mt-7 max-w-2xl text-base leading-8 text-[#718483] sm:text-lg"
               >
-                Deploy intelligent AI research agents to explore topics,
-                synthesize knowledge, and generate comprehensive research
-                reports in seconds.
+                Submit a topic and let AI agents gather research notes, assess
+                uncertainty, and create a structured report with references.
               </motion.p>
 
               <motion.div
@@ -211,7 +212,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            {/* RESEARCH PREVIEW */}
+
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -227,7 +228,7 @@ export default function Home() {
                         <Microscope size={21} aria-hidden="true" />
                       </span>
                       <span className="font-bold tracking-tight text-slate-100">
-                        Nexora
+                        Nexora AI
                       </span>
                     </div>
                     <div className="flex-1 px-4 py-7">
@@ -269,8 +270,8 @@ export default function Home() {
                           </span>
                         </h2>
                         <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-slate-400">
-                          Deploy advanced AI agents to synthesize knowledge
-                          from the entire web in seconds.
+                          A researcher gathers notes, an analyst flags
+                          uncertainty, and a writer prepares your report.
                         </p>
                       </div>
 
@@ -300,18 +301,18 @@ export default function Home() {
                         {[
                           {
                             icon: Globe2,
-                            title: "Real-time Web",
-                            description: "Latest data and academic papers.",
+                            title: "Source References",
+                            description: "Review source references alongside your report.",
                           },
                           {
                             icon: Telescope,
-                            title: "Deep Synthesis",
-                            description: "Multiple perspectives, one report.",
+                            title: "Critical Review",
+                            description: "An analyst flags unsupported claims and uncertainty.",
                           },
                           {
                             icon: Sparkles,
-                            title: "Pro Insights",
-                            description: "Expert insights with citations.",
+                            title: "Structured Reports",
+                            description: "Reports include findings, benefits, and challenges.",
                           },
                         ].map(({ icon: Icon, title, description }) => (
                           <div
@@ -339,7 +340,7 @@ export default function Home() {
             </motion.div>
           </section>
 
-          {/* FEATURES */}
+
           <section id="features" className="bg-white px-6 py-24">
             <div className="mx-auto max-w-7xl">
               <div className="mx-auto max-w-2xl text-center">
@@ -354,8 +355,8 @@ export default function Home() {
                 </h2>
 
                 <p className="mt-5 text-sm leading-7 text-[#829492] sm:text-base">
-                  Powerful research capabilities designed to help you explore
-                  ideas, understand complex topics, and discover insights.
+                  Research a topic with AI agents and get a structured report
+                  with findings, benefits, challenges, and references.
                 </p>
               </div>
 
@@ -392,7 +393,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* HOW IT WORKS */}
+
           <section id="how-it-works" className="px-6 py-24">
             <div className="mx-auto max-w-7xl">
               <div className="text-center">
@@ -434,7 +435,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* CTA */}
+
           <section id="about" className="px-6 pb-24">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -456,8 +457,8 @@ export default function Home() {
                 </h2>
 
                 <p className="mt-6 text-sm leading-7 text-white/70 sm:text-base">
-                  Explore new ideas, uncover valuable insights, and transform
-                  the way you research with AI.
+                  Turn a research question into a structured report with
+                  findings, challenges, and references.
                 </p>
 
                 <button

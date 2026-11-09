@@ -6,6 +6,7 @@ load_dotenv()
 
 REDIS_URL = os.getenv("REDIS_URL")
 
+# Create the Redis connection.
 def redis_connection() -> Redis:
     return Redis.from_url(
         REDIS_URL or "redis://localhost:6379",

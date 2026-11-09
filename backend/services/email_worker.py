@@ -32,6 +32,7 @@ EMAIL_HANDLERS: dict[str, Callable[..., None]] = {
 }
 
 
+# Move an email job to the target queue.
 async def _move_job(
     redis: Redis,
     current_job: str,
@@ -45,6 +46,7 @@ async def _move_job(
         await pipeline.execute()
 
 
+# Validate and deliver a queued email job.
 async def process_email_job(redis: Redis, raw_job: str) -> None:
     try:
         job: dict[str, Any] = json.loads(raw_job)
@@ -84,6 +86,7 @@ async def process_email_job(redis: Redis, raw_job: str) -> None:
     logger.info("Email job delivered successfully.")
 
 
+# Return unfinished email jobs to the queue.
 async def _recover_processing_jobs(redis: Redis) -> None:
     recovered = 0
     while await redis.rpoplpush(EMAIL_PROCESSING_KEY, EMAIL_QUEUE_KEY):
@@ -92,6 +95,7 @@ async def _recover_processing_jobs(redis: Redis) -> None:
         logger.warning("Recovered %s unfinished email jobs.", recovered)
 
 
+# Process email jobs from Redis.
 async def email_worker() -> None:
     async with redis_connection() as redis:
         await _recover_processing_jobs(redis)
@@ -106,6 +110,7 @@ async def email_worker() -> None:
                 await process_email_job(redis, raw_job)
 
 
+# Start the email worker.
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
     asyncio.run(email_worker())

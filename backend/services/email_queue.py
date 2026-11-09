@@ -12,6 +12,7 @@ class EmailQueueError(Exception):
     pass
 
 
+# Add an email job to the Redis queue.
 async def enqueue_email(job_type: str, **context: str) -> None:
     try:
         async with redis_connection() as redis:

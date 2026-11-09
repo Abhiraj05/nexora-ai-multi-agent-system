@@ -7,12 +7,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Toast from "@/components/Toast";
 
+// Render the site navigation bar.
 export default function Navbar({ handleNavigate }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [notice, setNotice] = useState("");
 
+  // Sign out the current user.
   const handleLogout = () => {
     const message = "You have been signed out successfully.";
     localStorage.removeItem("research_user");
@@ -61,7 +63,7 @@ export default function Navbar({ handleNavigate }) {
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-10">
           <Link
             href="/"
-            aria-label="Nexora home"
+            aria-label="Nexora AI home"
             className="flex items-center gap-3"
           >
             <span
@@ -70,11 +72,11 @@ export default function Navbar({ handleNavigate }) {
               <Microscope size={23} strokeWidth={2} aria-hidden="true" />
             </span>
             <span className="text-xl font-bold tracking-tight text-[#142625]">
-              Nexora
+              Nexora AI
             </span>
           </Link>
 
-          {/* Navigation Links */}
+
           <div className="hidden items-center gap-9 text-sm font-medium text-[#142625] md:flex">
             <Link href="#features" className="transition hover:text-primary-400">
               Features
@@ -99,7 +101,7 @@ export default function Navbar({ handleNavigate }) {
             </button>
           </div>
 
-          {/* Auth Buttons */}
+
           <div className="flex items-center gap-3">
             {user ? (
               <>

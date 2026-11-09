@@ -10,6 +10,7 @@ from sql.report_model import Report
 reports_router = Blueprint("reports", __name__, url_prefix="/api")
 
 
+# Convert a report record to its API representation.
 def _serialize_report(report: Report) -> dict:
     return {
         "id": report.id,
@@ -25,6 +26,7 @@ def _serialize_report(report: Report) -> dict:
     }
 
 
+# List reports for the signed-in user.
 @reports_router.get("/reports")
 async def list_reports_route():
     try:
@@ -46,6 +48,7 @@ async def list_reports_route():
         abort(500, description="Failed to fetch records.")
 
 
+# Save a report for the signed-in user.
 @reports_router.post("/reports")
 async def create_report_route():
     data = request.get_json(silent=True)
@@ -88,6 +91,7 @@ async def create_report_route():
         abort(500, description="Failed to create report.")
 
 
+# Delete a report owned by the signed-in user.
 @reports_router.delete("/reports/<int:report_id>")
 async def delete_report_route(report_id: int):
     try:

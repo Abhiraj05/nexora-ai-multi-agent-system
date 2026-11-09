@@ -9,6 +9,7 @@ from services.email_service import send_feedback_email
 feedback_router = Blueprint("feedback", __name__, url_prefix="/api")
 
 
+# Receive and queue user feedback.
 @feedback_router.post("/feedback")
 async def feedback_route():
     request_data = request.get_json(silent=True)

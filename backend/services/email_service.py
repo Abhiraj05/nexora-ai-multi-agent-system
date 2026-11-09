@@ -17,6 +17,7 @@ class EmailDeliveryError(Exception):
     pass
 
 
+# Send an email message through SMTP.
 def _send_email(
     recipient: str,
     subject: str,
@@ -52,10 +53,12 @@ def _send_email(
         raise EmailDeliveryError("Could not deliver the email.") from error
 
 
+# Render an email template with its context.
 def _render_email(template_name: str, **context: str) -> str:
     return _template_environment.get_template(template_name).render(**context)
 
 
+# Send the account signup confirmation email.
 def deliver_signup_success(email: str, username: str) -> None:
     message = "Your account has been created successfully."
     _send_email(
@@ -71,6 +74,7 @@ def deliver_signup_success(email: str, username: str) -> None:
     )
 
 
+# Send a password-reset code email.
 def deliver_password_reset_code(email: str, otp: str, user_name: str) -> None:
     message_text = "Use this one-time password to reset your password."
     _send_email(
@@ -96,6 +100,7 @@ def deliver_password_reset_code(email: str, otp: str, user_name: str) -> None:
     )
 
 
+# Send the password-reset confirmation email.
 def deliver_password_reset_success(email: str, user_name: str) -> None:
     message_text = (
         "Your password has been reset successfully. You can now sign in "
@@ -118,6 +123,7 @@ def deliver_password_reset_success(email: str, user_name: str) -> None:
     )
 
 
+# Send a feedback notification email.
 def deliver_feedback_email(username: str, email: str, message: str) -> None:
     recipient = os.environ.get("FEEDBACK_RECIPIENT_EMAIL")
     if not recipient:
@@ -136,10 +142,12 @@ def deliver_feedback_email(username: str, email: str, message: str) -> None:
     )
 
 
+# Queue the signup confirmation email.
 async def send_signup_success(email: str, username: str) -> None:
     await enqueue_email("signup_success", email=email, username=username)
 
 
+# Queue a password-reset code email.
 async def send_password_reset_code(email: str, otp: str, user_name: str) -> None:
     await enqueue_email(
         "password_reset_code",
@@ -149,6 +157,7 @@ async def send_password_reset_code(email: str, otp: str, user_name: str) -> None
     )
 
 
+# Queue the password-reset confirmation email.
 async def send_password_reset_success(email: str, user_name: str) -> None:
     await enqueue_email(
         "password_reset_success",
@@ -157,6 +166,7 @@ async def send_password_reset_success(email: str, user_name: str) -> None:
     )
 
 
+# Queue a feedback notification email.
 async def send_feedback_email(username: str, email: str, message: str) -> None:
     await enqueue_email(
         "feedback",

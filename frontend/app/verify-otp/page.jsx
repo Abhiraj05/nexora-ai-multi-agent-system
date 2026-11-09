@@ -9,6 +9,7 @@ import Loader from "@/components/Loader";
 import Toast from "@/components/Toast";
 import { ShieldCheck, RefreshCw, ArrowLeft } from "lucide-react";
 
+// Render the OTP verification form.
 function VerifyOTPContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,6 +27,7 @@ function VerifyOTPContent() {
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
 
+  // Navigate to the selected page.
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -33,7 +35,6 @@ function VerifyOTPContent() {
       router.push(route);
     }, 2000);
   };
-  // Get email from URL or sessionStorage
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const queryEmail = searchParams.get("email");
@@ -50,7 +51,6 @@ function VerifyOTPContent() {
     return () => window.clearTimeout(timeout);
   }, [searchParams]);
 
-  // Countdown timer
   useEffect(() => {
     if (timer <= 0) return;
 
@@ -82,14 +82,13 @@ function VerifyOTPContent() {
     },
   };
 
-  // Handle individual OTP input
+  // Update an OTP input value.
   const handleOtpChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
 
     setError("");
     setStatus("");
 
-    // Handle multiple pasted digits
     if (value.length > 1) {
       const digits = value.slice(0, 6).split("");
 
@@ -113,13 +112,12 @@ function VerifyOTPContent() {
 
     setOtp(newOtp);
 
-    // Automatically focus next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
-  // Handle keyboard navigation
+  // Handle keyboard navigation between OTP inputs.
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace") {
       if (!otp[index] && index > 0) {
@@ -136,7 +134,7 @@ function VerifyOTPContent() {
     }
   };
 
-  // Handle OTP paste
+  // Handle pasted OTP digits.
   const handlePaste = (e) => {
     e.preventDefault();
 
@@ -155,7 +153,7 @@ function VerifyOTPContent() {
     inputRefs.current[5]?.focus();
   };
 
-  // Verify OTP
+  // Validate and submit the form.
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -218,7 +216,7 @@ function VerifyOTPContent() {
     }
   };
 
-  // Resend OTP
+  // Request a new OTP.
   const handleResendOTP = async () => {
     if (timer > 0 || resending) return;
 
@@ -279,7 +277,7 @@ function VerifyOTPContent() {
             animate="visible"
             className="w-full max-w-md mx-auto"
           >
-            {/* Heading */}
+
             <motion.div variants={itemVariants}>
               <div className="w-12 h-12 rounded-xl bg-[#eaf3f3] text-teal flex items-center justify-center mb-5">
                 <ShieldCheck size={24} />
@@ -297,12 +295,12 @@ function VerifyOTPContent() {
               </p>
             </motion.div>
 
-            {/* Form */}
+
             <motion.div
               variants={itemVariants}
               className="soft-card p-7 md:p-8 mt-8"
             >
-              {/* Email */}
+
               <div className="text-center mb-7">
                 <p className="text-sm text-muted">Verification code sent to</p>
 
@@ -312,7 +310,7 @@ function VerifyOTPContent() {
               </div>
 
               <form onSubmit={handleSubmit}>
-                {/* OTP Inputs */}
+
                 <label className="mb-4 block text-center text-sm font-semibold">
                   Enter verification code
                 </label>
@@ -345,7 +343,7 @@ function VerifyOTPContent() {
                   ))}
                 </div>
 
-                {/* Verify Button */}
+
                 <motion.button
                   type="submit"
                   disabled={loading || otp.join("").length !== 6}
@@ -359,7 +357,7 @@ function VerifyOTPContent() {
                 </motion.button>
               </form>
 
-              {/* Resend OTP */}
+
               <div className="mt-6 text-center">
                 <p className="text-sm text-muted">Didn&apos;t receive the code?</p>
 
@@ -384,7 +382,7 @@ function VerifyOTPContent() {
                 </motion.button>
               </div>
 
-              {/* Back to Forgot Password */}
+
               <motion.div
                 variants={itemVariants}
                 className="mt-7 border-t border-[#e5eeee] pt-6 text-center"
@@ -405,6 +403,7 @@ function VerifyOTPContent() {
   );
 }
 
+// Render the OTP verification page.
 export default function VerifyOTP() {
   return (
     <Suspense

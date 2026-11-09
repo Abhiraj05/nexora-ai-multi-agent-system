@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Microscope } from "lucide-react";
 
+// Render the loading indicator.
 export default function Loader({ text = "Loading...", fullscreen = true }) {
   return (
     <div
@@ -10,7 +11,7 @@ export default function Loader({ text = "Loading...", fullscreen = true }) {
       role="status"
       aria-live="polite"
     >
-      {/* Background Glow */}
+
       <motion.div
         animate={{
           scale: [1, 1.3, 1],
@@ -30,9 +31,9 @@ export default function Loader({ text = "Loading...", fullscreen = true }) {
         transition={{ duration: 0.4 }}
         className="relative flex flex-col items-center"
       >
-        {/* Loader Animation */}
+
         <div className="relative flex h-20 w-20 items-center justify-center">
-          {/* Outer Ring */}
+
           <motion.div
             animate={{ rotate: 360 }}
             transition={{
@@ -43,7 +44,7 @@ export default function Loader({ text = "Loading...", fullscreen = true }) {
             className="absolute inset-0 rounded-full border-[3px] border-[#44858e]/15 border-t-[#44858e]"
           />
 
-          {/* Inner Ring */}
+
           <motion.div
             animate={{ rotate: -360 }}
             transition={{
@@ -54,7 +55,7 @@ export default function Loader({ text = "Loading...", fullscreen = true }) {
             className="absolute inset-3 rounded-full border-[3px] border-[#326e75]/10 border-b-[#326e75]"
           />
 
-          {/* Center Icon */}
+
           <motion.div
             animate={{
               scale: [1, 1.15, 1],
@@ -70,7 +71,7 @@ export default function Loader({ text = "Loading...", fullscreen = true }) {
           </motion.div>
         </div>
 
-        {/* Loading Text */}
+
         <motion.p
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{
@@ -83,7 +84,7 @@ export default function Loader({ text = "Loading...", fullscreen = true }) {
           {text}
         </motion.p>
 
-        {/* Loading Dots */}
+
         <div className="mt-3 flex items-center gap-1.5">
           {[0, 1, 2].map((item) => (
             <motion.span

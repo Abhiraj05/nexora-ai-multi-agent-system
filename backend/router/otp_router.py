@@ -15,6 +15,7 @@ from schemas.password_reset_schemas import VerifyOTPRequest
 otp_router = Blueprint("otp", __name__, url_prefix="/api/auth")
 
 
+# Verify a password-reset code.
 @otp_router.post("/verify-otp")
 async def verify_otp_route():
     data = request.get_json(silent=True)

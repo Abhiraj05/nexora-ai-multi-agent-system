@@ -2,7 +2,6 @@ from flask import Blueprint, abort, current_app, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 from auth.hash_password import hash_password, verify_password
 from auth.jwt_token import create_token, get_current_user
 from schemas.user_schemas import UserCreate, UserProfileUpdate, UserSignIn
@@ -13,6 +12,7 @@ from sql.user_model import User
 auth_router = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
+# Register a new user account.
 @auth_router.post("/signup")
 async def signup_route():
     data = request.get_json(silent=True)
@@ -65,6 +65,7 @@ async def signup_route():
     }), 201
 
 
+# Authenticate a user and return an access token.
 @auth_router.post("/signin")
 async def signin_route():
     data = request.get_json(silent=True)
@@ -95,6 +96,7 @@ async def signin_route():
         })
 
 
+# Return the signed-in user profile.
 @auth_router.get("/profile")
 async def profile_route():
     session_factory = current_app.extensions["async_db_session_factory"]
@@ -109,6 +111,7 @@ async def profile_route():
         })
 
 
+# Update the signed-in user profile.
 @auth_router.patch("/profile")
 async def update_profile_route():
     data = request.get_json(silent=True)
@@ -162,6 +165,7 @@ async def update_profile_route():
         return jsonify(response)
 
 
+# Delete the signed-in user account.
 @auth_router.delete("/profile")
 async def delete_profile_route():
     session_factory = current_app.extensions["async_db_session_factory"]

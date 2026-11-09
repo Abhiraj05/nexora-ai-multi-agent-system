@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List
 
 
+# Define the structured research report fields.
 class ResearchReport(BaseModel):
 
     title: str = Field(

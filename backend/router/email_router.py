@@ -22,6 +22,7 @@ GENERIC_RESPONSE = {
 }
 
 
+# Send a password-reset code by email.
 async def _send_code():
     request_data = request.get_json(silent=True)
     try:
@@ -67,11 +68,13 @@ async def _send_code():
     return jsonify(GENERIC_RESPONSE)
 
 
+# Send a password-reset code to the user.
 @email_router.post("/reset-password")
 async def reset_password_email_route():
     return await _send_code()
 
 
+# Resend a password-reset code.
 @email_router.post("/resend-otp")
 async def resend_otp_route():
     return await _send_code()

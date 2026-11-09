@@ -16,6 +16,7 @@ password_router = Blueprint("password", __name__, url_prefix="/api/auth")
 INVALID_RESET_MESSAGE = "Invalid or expired password reset session."
 
 
+# Update the user's password after verification.
 @password_router.post("/update-password")
 async def update_password_route():
     data = request.get_json(silent=True)

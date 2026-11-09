@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
+// Render a notification message.
 export default function Toast({
   message,
   type = "success",

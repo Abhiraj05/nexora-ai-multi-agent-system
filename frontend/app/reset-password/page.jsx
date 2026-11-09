@@ -8,6 +8,7 @@ import { LockKeyhole, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import AuthShell from "@/components/AuthShell";
 import Toast from "@/components/Toast";
 
+// Render the password-reset page.
 export default function ResetPassword() {
   const router = useRouter();
 
@@ -19,7 +20,6 @@ export default function ResetPassword() {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 25 },
     visible: {
@@ -41,7 +41,7 @@ export default function ResetPassword() {
     },
   };
 
-  // Handle input changes
+  // Update the form field value.
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -54,7 +54,7 @@ export default function ResetPassword() {
     setError("");
   };
 
-  // Handle password reset
+  // Validate and submit the form.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -142,7 +142,7 @@ export default function ResetPassword() {
           className="space-y-5"
         >
 
-        {/* New Password */}
+
         <motion.label
           variants={itemVariants}
           className="block text-sm font-semibold"
@@ -174,7 +174,7 @@ export default function ResetPassword() {
           </div>
         </motion.label>
 
-        {/* Confirm Password */}
+
         <motion.label
           variants={itemVariants}
           className="block text-sm font-semibold"
@@ -205,7 +205,7 @@ export default function ResetPassword() {
           </div>
         </motion.label>
 
-        {/* Password Match Indicator */}
+
         {confirm.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -224,7 +224,7 @@ export default function ResetPassword() {
           </motion.div>
         )}
 
-        {/* Submit Button */}
+
         <motion.button
           type="submit"
           whileHover={{ scale: 1.02 }}

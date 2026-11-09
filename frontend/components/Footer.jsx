@@ -5,6 +5,7 @@ import { Microscope } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+// Render the site footer.
 export default function Footer({ handleNavigate }) {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,24 +20,24 @@ export default function Footer({ handleNavigate }) {
   return (
     <footer className="border-t border-[#e7eeed] bg-white px-6 py-12">
       <div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 md:flex-row">
-        {/* Brand */}
+
         <div className="max-w-sm">
-          <Link href="/" aria-label="Nexora home" className="flex items-center gap-3">
+          <Link href="/" aria-label="Nexora AI home" className="flex items-center gap-3">
             <span
               className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white"
             >
               <Microscope size={21} strokeWidth={2} aria-hidden="true" />
             </span>
-            <span className="text-lg font-bold text-[#142625]">Nexora</span>
+            <span className="text-lg font-bold text-[#142625]">Nexora AI</span>
           </Link>
 
           <p className="mt-5 text-sm leading-7 text-[#829492]">
-            An intelligent research assistant that helps you explore, analyze,
-            and discover knowledge with AI.
+            AI researcher, analyst, and writer agents turn your topic into a
+            structured report with findings, challenges, and references.
           </p>
         </div>
 
-        {/* Footer Links */}
+
         <div className="flex flex-wrap gap-16">
           <div>
             <h4 className="text-sm font-bold text-[#142625]">Platform</h4>
@@ -96,9 +97,9 @@ export default function Footer({ handleNavigate }) {
         </div>
       </div>
 
-      {/* Copyright */}
+
       <div className="mx-auto mt-12 max-w-7xl border-t border-[#edf0ef] pt-7 text-center text-xs text-[#9aabaa] sm:text-left">
-        © 2026 Nexora. All rights reserved.
+        © 2026 Nexora AI. All rights reserved.
       </div>
     </footer>
   );

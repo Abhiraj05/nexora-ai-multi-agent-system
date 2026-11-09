@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from db.db_connection import Base
 
 
+# Store structured research reports owned by users.
 class Report(Base):
     __tablename__ = "reports"
 

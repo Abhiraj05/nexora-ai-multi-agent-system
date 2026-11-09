@@ -17,6 +17,7 @@ const labels = {
   conclusion: "Conclusion",
   references: "References",
 };
+// Render a research report.
 export default function ReportView({ report, onBack }) {
   if (!report) return null;
   const reportText = [
@@ -36,6 +37,7 @@ export default function ReportView({ report, onBack }) {
       ? reportDate.toLocaleString()
       : "";
 
+  // Download the report as a text file.
   const download = () => {
     const blob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);

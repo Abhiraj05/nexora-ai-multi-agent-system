@@ -9,6 +9,7 @@ import AuthShell from "@/components/AuthShell";
 import Loader from "@/components/Loader";
 import Toast from "@/components/Toast";
 
+// Render the forgot-password page.
 export default function ForgotPassword() {
   const router = useRouter();
 
@@ -16,6 +17,7 @@ export default function ForgotPassword() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Navigate to the selected page.
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -23,7 +25,6 @@ export default function ForgotPassword() {
       router.push(route);
     }, 2000);
   };
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 25 },
     visible: {
@@ -45,13 +46,13 @@ export default function ForgotPassword() {
     },
   };
 
-  // Handle input changes
+  // Update the form field value.
   const handleChange = (e) => {
     setEmail(e.target.value);
     setError("");
   };
 
-  // Handle form submission
+  // Validate and submit the form.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -86,7 +87,6 @@ export default function ForgotPassword() {
         );
         setEmail("");
 
-        // Clear any previous OTP
         sessionStorage.removeItem("reset_otp");
 
         router.push("/verify-otp");
@@ -125,7 +125,7 @@ export default function ForgotPassword() {
             animate="visible"
             className="space-y-5"
           >
-            {/* Email Input */}
+
             <motion.label
               variants={itemVariants}
               className="block text-sm font-semibold"
@@ -143,7 +143,7 @@ export default function ForgotPassword() {
               </div>
             </motion.label>
 
-            {/* Submit Button */}
+
             <motion.button
               type="submit"
               whileHover={{ scale: 1.02 }}
@@ -164,7 +164,7 @@ export default function ForgotPassword() {
               )}
             </motion.button>
 
-            {/* Back to Signin */}
+
             <motion.div variants={itemVariants} className="flex justify-center">
               <button
                 onClick={() => handleNavigate("/signin")}

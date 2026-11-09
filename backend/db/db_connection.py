@@ -15,6 +15,7 @@ class Base(DeclarativeBase):
     pass
 
 
+# Configure the asynchronous database connection.
 def configure_database(app: Flask) -> None:
     from sql import Report, User
 

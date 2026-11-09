@@ -14,22 +14,23 @@ const features = [
   {
     icon: Globe2,
     color: "text-blue-500",
-    title: "Real-time Web",
-    desc: "Access the latest data and academic papers live.",
+    title: "Source References",
+    desc: "Get research references alongside your generated report.",
   },
   {
     icon: Telescope,
     color: "text-purple-500",
-    title: "Deep Synthesis",
-    desc: "Analyze multiple perspectives for complex topics.",
+    title: "Critical Analysis",
+    desc: "Research notes are reviewed for assumptions and uncertainty.",
   },
   {
     icon: Sparkles,
     color: "text-amber-500",
-    title: "Pro Insights",
-    desc: "Generate expert-level reports with citations.",
+    title: "Structured Reports",
+    desc: "Explore findings, benefits, challenges, and conclusions in one report.",
   },
 ];
+// Render the research topic form.
 export default function ResearchHome({ onResearch, loading }) {
   const [topic, setTopic] = useState(() =>
     typeof window !== "undefined"
@@ -39,11 +40,13 @@ export default function ResearchHome({ onResearch, loading }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Update the form field value.
   const handleChange = (event) => {
     setTopic(event.target.value);
     setError("");
   };
 
+  // Validate and submit the form.
   const handleSubmit = async (e) => {
     e.preventDefault();
     const researchTopic = topic.trim();
@@ -100,12 +103,16 @@ export default function ResearchHome({ onResearch, loading }) {
       </div>
       <form
         onSubmit={handleSubmit}
-        className="mt-12 bg-white border border-[#e2e9e8] rounded-[18px] p-5 shadow-[0_2px_10px_rgba(0,0,0,.025)]"
+        aria-busy={isLoading}
+        className={`mt-12 bg-white border border-[#e2e9e8] rounded-[18px] p-5 shadow-[0_2px_10px_rgba(0,0,0,.025)] transition-all duration-300 ${
+          isLoading ? "ring-2 ring-teal/20 shadow-lg shadow-teal/10" : ""
+        }`}
       >
         <textarea
           aria-label="Research topic"
           value={topic}
           onChange={handleChange}
+          readOnly={isLoading}
           placeholder="What do you want to know?"
           rows={2}
           className="w-full resize-none text-[15px] placeholder:text-[#b0bdbc] outline-none"
@@ -122,6 +129,7 @@ export default function ResearchHome({ onResearch, loading }) {
             <button
               type="submit"
               disabled={!topic.trim() || isLoading}
+              aria-label={isLoading ? "Generating report" : "Generate report"}
               className="rounded-full bg-[#e9f1f1] text-teal w-10 h-10 grid place-items-center hover:bg-[#d6e9e9]"
             >
               {isLoading ? (
@@ -132,6 +140,26 @@ export default function ResearchHome({ onResearch, loading }) {
             </button>
           </div>
         </div>
+        {isLoading && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mt-4 border-t border-[#e2e9e8] pt-4"
+          >
+            <p className="text-sm font-medium text-teal">
+              Generating your research report
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              Searching the web and synthesizing sources...
+            </p>
+            <div
+              aria-hidden="true"
+              className="mt-3 h-1 overflow-hidden rounded-full bg-[#e9f1f1]"
+            >
+              <div className="research-progress h-full rounded-full bg-teal" />
+            </div>
+          </div>
+        )}
       </form>
       <div className="grid md:grid-cols-3 gap-5 mt-16">
         {features.map((f) => (

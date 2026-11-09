@@ -16,6 +16,7 @@ ALGORITHM = "HS256"
 TOKEN_LIFETIME = timedelta(hours=1)
 
 
+# Read the JWT signing key from configuration.
 def _secret_key() -> str:
     secret_key = current_app.config.get("SECRET_KEY") or os.getenv("SECRET_KEY")
     if not secret_key:
@@ -24,12 +25,14 @@ def _secret_key() -> str:
     return secret_key
 
 
+# Create a signed authentication token.
 def create_token(data: dict[str, Any]) -> str:
     payload = data.copy()
     payload["exp"] = datetime.now(timezone.utc) + TOKEN_LIFETIME
     return jwt.encode(payload, _secret_key(), algorithm=ALGORITHM)
 
 
+# Read the authenticated email from the request token.
 def _current_user_email() -> str:
     authorization = request.headers.get("Authorization", "")
     scheme, separator, token = authorization.partition(" ")
@@ -47,6 +50,7 @@ def _current_user_email() -> str:
     return email
 
 
+# Load the authenticated user from the database.
 async def get_current_user(db: AsyncSession) -> User:
     email = _current_user_email()
     user = await db.scalar(select(User).where(User.email == email))

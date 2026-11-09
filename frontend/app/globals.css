@@ -73,6 +73,24 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
+.research-progress {
+  width: 35%;
+  animation: research-progress 1.4s ease-in-out infinite;
+}
+@keyframes research-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .research-progress {
+    width: 100%;
+    animation: none;
+  }
+}
 .soft-card {
   background: rgb(15 23 42 / 0.88);
   border: 1px solid rgb(148 163 184 / 0.24);

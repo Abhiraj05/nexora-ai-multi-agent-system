@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from db.db_connection import Base
 
 
+# Store account details and the user's saved reports.
 class User(Base):
     __tablename__ = "users"
 

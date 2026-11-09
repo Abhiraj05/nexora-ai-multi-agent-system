@@ -9,6 +9,7 @@ import Loader from "@/components/Loader";
 import Toast from "@/components/Toast";
 import { Eye, EyeOff } from "lucide-react";
 
+// Render the signup page.
 export default function Signup() {
   const router = useRouter();
   const [checkingSession, setCheckingSession] = useState(true);
@@ -35,7 +36,6 @@ export default function Signup() {
     return () => window.clearTimeout(timeout);
   }, [router]);
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 25 },
     visible: {
@@ -57,6 +57,7 @@ export default function Signup() {
     },
   };
 
+  // Navigate to the selected page.
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -65,7 +66,7 @@ export default function Signup() {
     }, 2000);
   };
 
-  // Handle input changes
+  // Update the form field value.
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -80,7 +81,7 @@ export default function Signup() {
     setError("");
   };
 
-  // Handle signup submission
+  // Validate and submit the form.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -156,7 +157,7 @@ export default function Signup() {
               You&apos;re all set
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-300">
-              Your account was created. Sign in to start using Nexora.
+              Your account was created. Sign in to start using Nexora AI.
             </p>
             <button
               type="button"
@@ -184,7 +185,7 @@ export default function Signup() {
             animate="visible"
             className="space-y-5"
           >
-            {/* Full Name */}
+
             <motion.label
               variants={itemVariants}
               className="block text-sm font-semibold"
@@ -201,7 +202,7 @@ export default function Signup() {
               </div>
             </motion.label>
 
-            {/* Email */}
+
             <motion.label
               variants={itemVariants}
               className="block text-sm font-semibold"
@@ -219,7 +220,7 @@ export default function Signup() {
               </div>
             </motion.label>
 
-            {/* Password */}
+
             <motion.label
               variants={itemVariants}
               className="block text-sm font-semibold"
@@ -246,7 +247,7 @@ export default function Signup() {
               </div>
             </motion.label>
 
-            {/* Signup Button */}
+
             <motion.button
               type="submit"
               whileHover={{ scale: 1.02 }}
@@ -264,7 +265,7 @@ export default function Signup() {
               )}
             </motion.button>
 
-            {/* Signin Link */}
+
             <motion.p
               variants={itemVariants}
               className="text-sm text-center text-muted"

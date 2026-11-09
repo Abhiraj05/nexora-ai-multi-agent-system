@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
 import Toast from "@/components/Toast";
 
+// Render the feedback page.
 export default function Feedback() {
   const router = useRouter();
   const [name, setName] = useState(""),
@@ -19,6 +20,7 @@ export default function Feedback() {
     [status, setStatus] = useState(""),
     [statusType, setStatusType] = useState("success");
   const [loading, setLoading] = useState(false);
+  // Navigate to the selected page.
   const handleNavigate = (route) => {
     setLoading(true);
     setTimeout(() => {
@@ -45,6 +47,7 @@ export default function Feedback() {
     },
   };
 
+  // Update the form field value.
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -53,6 +56,7 @@ export default function Feedback() {
     if (name === "message") setMessage(value);
   };
 
+  // Submit the feedback form.
   async function submit(e) {
     e.preventDefault();
     setBusy(true);
