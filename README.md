@@ -12,7 +12,7 @@ Research uses OpenRouter models with role-specific output limits:
 ## Tech Stack
 
 - **Frontend:** Next.js, Tailwind CSS, Motion, Axios, and Lucide React.
-- **Backend:** Python 3.13, Flask (async), AutoGen AgentChat, and SQLAlchemy (async).
+- **Backend:** Python 3.13, Flask (async), AutoGen AgentChat, Jinja2 and SQLAlchemy (async).
 - **AI models:** OpenRouter-hosted models available on Hugging Face; Liquid LFM for research and Dots 3 Note Preview for analysis and report writing.
 - **Data and migrations:** PostgreSQL, Redis, and Alembic.
 - **Authentication and email:** JWT-based authentication, SMTP, and a Redis-backed email worker.
@@ -120,6 +120,10 @@ Run frontend checks from `frontend`:
 npm run lint
 npm run build
 ```
+
+## System Architecture
+<img width="1570" height="668" alt="Nexora AI Research Platform Architecture (1)" src="https://github.com/user-attachments/assets/b8ea9a0c-0bd7-4c9f-b397-bd28a9bc7027" />
+
 ## Screenshots of All Pages
 <img width="1920" alt="landing" src="https://github.com/user-attachments/assets/2381be1c-66a1-4707-b6df-e33592178854" />
 
